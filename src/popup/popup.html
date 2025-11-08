@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thadai</title>
+    <style>
+      .popup-user-inputs-section {
+        display: none;
+      }
+      .popup-user-inputs-section.visible {
+        display: block;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="popup-window">
+      <p id="popup-heading">Thadai</p>
+      <div class="popup-user-inputs-section" id="popup-user-inputs-section">
+        <input
+          id="popup-user-input-amount"
+          type="number"
+          placeholder="Amount in (ETH)"
+        />
+        <button id="popup-user-deposit-intent-button">
+          User Deposit Intent
+        </button>
+      </div>
+    </div>
+    <script src="../core-eth/ethers.js"></script>
+    <script src="../core-eth/eth-contract-metadata.js"></script>
+    <script src="./popup.js"></script>
+  </body>
+</html>

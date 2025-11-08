@@ -16,6 +16,7 @@
         "service_worker": "background/background-worker.js"
     },
     "permissions": [
-        "tabs"
+        "tabs",
+        "storage"
     ]
 }
