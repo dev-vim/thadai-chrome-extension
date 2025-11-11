@@ -70,17 +70,17 @@ function processViewPortBlock() {
     })
 }
 
+function blockViewPort() {
+    let viewPortBlocker = ViewPortBlocker();
+    document.body.style.overflow = 'hidden';
+    document.body.appendChild(viewPortBlocker);
+}
+
 function unblockViewPort() {
     const viewPortBlocker = document.getElementById('thadai-viewport-blocker');
     if (viewPortBlocker) {
         viewPortBlocker.remove();
     }
-}
-
-function blockViewPort() {
-    let viewPortBlocker = ViewPortBlocker();
-    document.body.style.overflow = 'hidden';
-    document.body.appendChild(viewPortBlocker);
 }
 
 const websitesToBlock = [

@@ -12,11 +12,11 @@ const CHAIN_ID = 31337;
 const CHAIN_RPC_URL = "http://localhost:8545";
 
 // USER STUFF
-const USER_ADDRESS = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
-const USER_PRIVATE_KEY = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
+const USER_ADDRESS = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8";
+const USER_PRIVATE_KEY = "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d";
 
 // THADAI CONTRACT STUFF
-const THADAI_ADDRESS = "0x5b73C5498c1E3b4dbA84de0F1833c4a029d90519"; // my local anvil contract address
+const THADAI_ADDRESS = "0x5fc748f1FEb28d7b76fa1c6B07D8ba2d5535177c"; // my local anvil contract address
 const THADAI_ABI = [
   {
     type: "constructor",
@@ -244,4 +244,132 @@ const THADAI_ABI = [
 
 function getThadaiContract(signerOrProvider) {
   return new ethers.Contract(THADAI_ADDRESS, THADAI_ABI, signerOrProvider);
+}
+
+/**
+ * Decode custom error from transaction error data
+ * @param {string} errorData - The error data from the transaction (e.g., "0xcfba7ac6...")
+ * @returns {Object|null} Decoded error object with name and args, or null if cannot decode
+ */
+function decodeCustomError(errorData) {
+  if (!errorData || typeof errorData !== 'string' || !errorData.startsWith('0x')) {
+    return null;
+  }
+
+  try {
+    // Use ethers Interface to parse the error
+    const iface = new ethers.Interface(THADAI_ABI);
+    const decoded = iface.parseError(errorData);
+    
+    return {
+      name: decoded.name,
+      args: decoded.args,
+      signature: decoded.signature
+    };
+  } catch (e) {
+    // If parsing fails, try to manually match by selector
+    const selector = errorData.slice(0, 10);
+    
+    for (const abiItem of THADAI_ABI) {
+      if (abiItem.type === 'error') {
+        const errorSignature = `${abiItem.name}(${abiItem.inputs.map(i => i.type).join(',')})`;
+        const computedSelector = ethers.id(errorSignature).slice(0, 10);
+        
+        if (computedSelector.toLowerCase() === selector.toLowerCase()) {
+          // Try to decode parameters manually
+          try {
+            const iface = new ethers.Interface([abiItem]);
+            const decoded = iface.parseError(errorData);
+            return {
+              name: decoded.name,
+              args: decoded.args,
+              signature: errorSignature
+            };
+          } catch (decodeError) {
+            // Return basic info if decoding fails
+            return {
+              name: abiItem.name,
+              args: abiItem.inputs,
+              signature: errorSignature,
+              rawData: errorData.slice(10)
+            };
+          }
+        }
+      }
+    }
+    
+    return null;
+  }
+}
+
+/**
+ * Format error message for display to user
+ * @param {Error} error - The error object from ethers.js
+ * @param {ethers.Contract} contract - The contract instance (optional, for fetching additional info)
+ * @returns {Promise<string>} Formatted error message
+ */
+async function formatContractError(error, contract = null) {
+  // Try to get error data from various possible locations
+  // Error data can be in different places depending on how the error was thrown
+  let errorData = null;
+  
+  // Check multiple possible locations for error data
+  if (error.data) {
+    errorData = error.data;
+  } else if (error.reason) {
+    if (typeof error.reason === 'string' && error.reason.startsWith('0x')) {
+      errorData = error.reason;
+    } else if (error.reason.data) {
+      errorData = error.reason.data;
+    } else if (error.reason.error && error.reason.error.data) {
+      errorData = error.reason.error.data;
+    }
+  } else if (error.error && error.error.data) {
+    errorData = error.error.data;
+  }
+  
+  // Also check the error message for embedded data (sometimes ethers includes it)
+  if (!errorData && error.message) {
+    const dataMatch = error.message.match(/data="(0x[0-9a-fA-F]+)"/);
+    if (dataMatch) {
+      errorData = dataMatch[1];
+    }
+  }
+
+  if (errorData) {
+    const decoded = decodeCustomError(errorData);
+    if (decoded) {
+      if (decoded.name === 'PaymentBelowMinimumAmount' && decoded.args && decoded.args.length > 0) {
+        const minimumAmount = decoded.args[0];
+        const minimumEth = ethers.formatEther(minimumAmount);
+        // Also try to get current minimum from contract if available
+        if (contract) {
+          try {
+            const contractMinimum = await contract.minimumPaymentAmount();
+            const contractMinimumEth = ethers.formatEther(contractMinimum);
+            return `Payment is below the minimum amount required. Minimum payment: ${contractMinimumEth} ETH`;
+          } catch (e) {
+            // If we can't fetch from contract, use decoded value
+          }
+        }
+        return `Payment is below the minimum amount required. Minimum payment: ${minimumEth} ETH`;
+      } else if (decoded.name === 'NoBalanceToWithdraw') {
+        return 'No balance available to withdraw';
+      } else if (decoded.name === 'WithdrawalCooldownActive' && decoded.args && decoded.args.length > 0) {
+        const cooldownRemaining = decoded.args[0];
+        const daysRemaining = Number(cooldownRemaining) / (24 * 60 * 60);
+        const hoursRemaining = Number(cooldownRemaining) / (60 * 60);
+        if (daysRemaining >= 1) {
+          return `Withdrawal cooldown is still active. Please wait ${daysRemaining.toFixed(2)} more days`;
+        } else {
+          return `Withdrawal cooldown is still active. Please wait ${hoursRemaining.toFixed(2)} more hours`;
+        }
+      } else {
+        return `Contract error: ${decoded.name}${decoded.args ? ` (${decoded.args.map(a => a.toString()).join(', ')})` : ''}`;
+      }
+    }
+  }
+
+  // Fallback to ethers.js error message
+  return error.shortMessage || error.message || 'Transaction failed';
 }

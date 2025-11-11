@@ -14,17 +14,11 @@ document.addEventListener("DOMContentLoaded", async function () {
   
       const inputSection = document.getElementById("popup-user-inputs-section");
       const button = document.getElementById("popup-user-deposit-intent-button");
-      // Show the input and button
       inputSection.classList.add("visible");
   
       if (popupLogic.popupOpenedProgrammatically) {
-        // Popup was opened programmatically (via chrome.action.openPopup())
-        // This is indirectly due to the user action on the blocked viewport
-        // Which implies the user intends to purchase access
         button.textContent = "Purchase access";
       } else {
-        // Popup was opened by user clicking the extension icon
-        // Which implies the user possibly intends to topup access
         button.textContent = "Topup access";
       }
     } catch (error) {
@@ -39,15 +33,9 @@ document.addEventListener("DOMContentLoaded", async function () {
       );
   
       if (popupLogic.popupOpenedProgrammatically) {
-        // Popup was opened programmatically (via chrome.action.openPopup())
-        // This is indirectly due to the user action on the blocked viewport
-        // Which implies the user intends to purchase access
         userPurchaseAccess()
-        // Clear the flag after checking
         chrome.storage.local.remove("popupOpenedProgrammatically");
       } else {
-        // Popup was opened by user clicking the extension icon
-        // Which implies the user possibly intends to topup access
         userTopUp()
       }
     } catch (error) {
@@ -72,8 +60,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       console.log("[PU] purchaseAccess receipt", receipt);
       notifyOnPurchaseAccessSuccess();
     } catch (error) {
-      console.error(error);
-      alert("Transaction failed: " + (error?.shortMessage || error?.message));
+      const errorMessage = await formatContractError(error, contract);
+      alert("Transaction failed: " + errorMessage);
     }
   }
   
@@ -105,8 +93,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       console.log("[PU] purchaseAccess receipt", receipt);
       notifyOnTopUpSuccess();
     } catch (error) {
-      console.error(error);
-      alert("Transaction failed: " + (error?.shortMessage || error?.message));
+      const errorMessage = await formatContractError(error, contract);
+      alert("Transaction failed: " + errorMessage);
     }
   }
   
