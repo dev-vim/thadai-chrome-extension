@@ -1,5 +1,22 @@
+import { SLIDER_CONFIG } from './popup-constants.js';
+import { updateUsageHint } from './popup-utils.js';
+
 document.addEventListener("DOMContentLoaded", async function () {
     await updatePopupContext();
+    
+    // Setup slider
+    const slider = document.getElementById("popup-amount-slider");
+    const usageHint = document.getElementById("popup-usage-hint");
+    
+    // Update usage hint when slider changes
+    slider.addEventListener("input", function() {
+      const value = parseFloat(slider.value);
+      updateUsageHint(usageHint, value);
+    });
+    
+    // Initialize usage hint with slider value
+    const initialValue = parseFloat(slider.value);
+    updateUsageHint(usageHint, initialValue);
     
     document
       .getElementById("popup-user-deposit-intent-button")
@@ -43,25 +60,56 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   }
   
-  async function userPurchaseAccess() {
-    const amount = document.getElementById("popup-user-input-amount").value;
-    if (!amount) {
-      return alert("Enter amount in ETH");
+  /**
+   * Get the current amount from the slider
+   * @returns {number} Amount in ETH
+   */
+  function getSliderAmount() {
+    const slider = document.getElementById("popup-amount-slider");
+    const amount = parseFloat(slider.value);
+    if (!amount || isNaN(amount)) {
+      throw new Error("Invalid amount");
     }
-  
+    return amount;
+  }
+
+  /**
+   * Execute a purchase access transaction
+   * @param {number} amount - Amount in ETH
+   */
+  async function executePurchaseAccess(amount) {
     const provider = new ethers.JsonRpcProvider(CHAIN_RPC_URL);
     const wallet = new ethers.Wallet(USER_PRIVATE_KEY, provider);
     const contract = getThadaiContract(wallet);
-  
+    
+    const wei = ethers.parseEther(amount.toString());
+    const tx = await contract.purchaseAccess({ value: wei });
+    const receipt = await tx.wait();
+    console.log("[PU] purchaseAccess receipt", receipt);
+    return receipt;
+  }
+
+  async function userPurchaseAccess() {
     try {
-      const wei = ethers.parseEther(amount);
-      const tx = await contract.purchaseAccess({ value: wei });
-      const receipt = await tx.wait();
-      console.log("[PU] purchaseAccess receipt", receipt);
+      const amount = getSliderAmount();
+      await executePurchaseAccess(amount);
       notifyOnPurchaseAccessSuccess();
     } catch (error) {
-      const errorMessage = await formatContractError(error, contract);
-      alert("Transaction failed: " + errorMessage);
+      if (error.message === "Invalid amount") {
+        alert("Invalid amount");
+        return;
+      }
+      
+      // Try to format contract error
+      try {
+        const provider = new ethers.JsonRpcProvider(CHAIN_RPC_URL);
+        const wallet = new ethers.Wallet(USER_PRIVATE_KEY, provider);
+        const contract = getThadaiContract(wallet);
+        const errorMessage = await formatContractError(error, contract);
+        alert("Transaction failed: " + errorMessage);
+      } catch (formatError) {
+        alert("Transaction failed: " + error.message);
+      }
     }
   }
   
@@ -77,24 +125,26 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
   
   async function userTopUp() {
-    const amount = document.getElementById("popup-user-input-amount").value;
-    if (!amount) {
-      return alert("Enter amount in ETH");
-    }
-  
-    const provider = new ethers.JsonRpcProvider(CHAIN_RPC_URL);
-    const wallet = new ethers.Wallet(USER_PRIVATE_KEY, provider);
-    const contract = getThadaiContract(wallet);
-  
     try {
-      const wei = ethers.parseEther(amount);
-      const tx = await contract.purchaseAccess({ value: wei });
-      const receipt = await tx.wait();
-      console.log("[PU] purchaseAccess receipt", receipt);
+      const amount = getSliderAmount();
+      await executePurchaseAccess(amount);
       notifyOnTopUpSuccess();
     } catch (error) {
-      const errorMessage = await formatContractError(error, contract);
-      alert("Transaction failed: " + errorMessage);
+      if (error.message === "Invalid amount") {
+        alert("Invalid amount");
+        return;
+      }
+      
+      // Try to format contract error
+      try {
+        const provider = new ethers.JsonRpcProvider(CHAIN_RPC_URL);
+        const wallet = new ethers.Wallet(USER_PRIVATE_KEY, provider);
+        const contract = getThadaiContract(wallet);
+        const errorMessage = await formatContractError(error, contract);
+        alert("Transaction failed: " + errorMessage);
+      } catch (formatError) {
+        alert("Transaction failed: " + error.message);
+      }
     }
   }
   
