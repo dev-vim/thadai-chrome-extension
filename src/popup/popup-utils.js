@@ -75,3 +75,44 @@ export function updateUsageHint(usageHintElement, ethAmount) {
   }
 }
 
+/**
+ * Show loading spinner by replacing button content
+ * @param {HTMLElement} buttonElement - The button element to replace
+ * @returns {string} The original button text content
+ */
+export function showLoadingSpinner(buttonElement) {
+  const originalText = buttonElement.textContent;
+  buttonElement.disabled = true;
+  buttonElement.classList.add('loading');
+  buttonElement.innerHTML = '<div class="loader"></div>';
+  return originalText;
+}
+
+/**
+ * Hide loading spinner and restore button
+ * @param {HTMLElement} buttonElement - The button element to restore
+ * @param {string} originalText - The original button text content
+ */
+export function hideLoadingSpinner(buttonElement, originalText) {
+  buttonElement.disabled = false;
+  buttonElement.classList.remove('loading');
+  buttonElement.textContent = originalText;
+}
+
+/**
+ * Hide payment-related elements and show success message
+ */
+export function showTransactionSuccess() {
+  const inputSection = document.getElementById("popup-user-inputs-section");
+  const successMessage = document.getElementById("popup-success-message");
+  
+  if (inputSection) {
+    inputSection.classList.remove("visible");
+    inputSection.style.display = "none";
+  }
+  
+  if (successMessage) {
+    successMessage.classList.add("visible");
+  }
+}
+
