@@ -11,10 +11,6 @@ const CHAIN_NAME = "anvil";
 const CHAIN_ID = 31337;
 const CHAIN_RPC_URL = "http://localhost:8545";
 
-// USER STUFF
-const USER_ADDRESS = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8";
-const USER_PRIVATE_KEY = "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d";
-
 // THADAI CONTRACT STUFF
 const THADAI_ADDRESS = "0x5fc748f1FEb28d7b76fa1c6B07D8ba2d5535177c"; // my local anvil contract address
 const THADAI_ABI = [

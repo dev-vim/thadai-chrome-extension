@@ -1,5 +1,5 @@
-import { SLIDER_CONFIG } from './popup-constants.js';
-import { updateUsageHint, showLoadingSpinner, hideLoadingSpinner, showTransactionSuccess } from './popup-utils.js';
+import { updateUsageHint, showLoadingSpinner, hideLoadingSpinner, showTransactionSuccess, showSetThadaiConfigMessage } from './popup-ui.js';
+import { executePurchaseAccess } from './popup-ethers.js';
 
 document.addEventListener("DOMContentLoaded", async function () {
   await updatePopupContext();
@@ -19,37 +19,106 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // Settings button logic
   const settingsBtn = document.getElementById("settings-btn");
-  const settingsPage = document.getElementById("settings-page");
-  const mainPopupContent = document.getElementById("main-popup-content");
+  const settingsPage = document.getElementById("popup-settings-page");
+  const mainPopupContent = document.getElementById("popup-content");
   const backBtn = document.getElementById("settings-back-btn");
-  const saveKeyBtn = document.getElementById("save-private-key-btn");
+  const saveSettingsBtn = document.getElementById("save-settings-btn");
   const privateKeyInput = document.getElementById("private-key-input");
+  const chainNameInput = document.getElementById("chain-name-input");
+  const chainIdInput = document.getElementById("chain-id-input");
+  const chainRpcUrlInput = document.getElementById("chain-rpc-url-input");
 
   settingsBtn.addEventListener("click", function () {
-    mainPopupContent.classList.add("hidden");
-    settingsPage.classList.remove("hidden");
-    backBtn.classList.remove("hidden");
-    settingsBtn.classList.add("hidden");
+    window.open(
+      'settings.html',
+      '_blank',
+      'width=320,height=500,left=100,top=100,menubar=no,toolbar=no,location=no,status=no'
+    );
   });
 
-  backBtn.addEventListener("click", function () {
+  backBtn.addEventListener("click", async function () {
     settingsPage.classList.add("hidden");
-    mainPopupContent.classList.remove("hidden");
-    backBtn.classList.add("hidden");
-    settingsBtn.classList.remove("hidden");
+    const USER_PRIVATE_KEY = await getPrivateKeyFromStorage();
+    const mainPopupContent = document.getElementById("popup-content");
+    const inputSection = document.getElementById("popup-user-inputs-section");
+    const successMessage = document.getElementById("popup-success-message");
+    if (USER_PRIVATE_KEY) {
+      mainPopupContent.classList.remove("hidden");
+      backBtn.classList.add("hidden");
+      settingsBtn.classList.remove("hidden");
+      // Show the input section and hide the success message
+      if (inputSection) {
+        await updatePopupContext();
+        inputSection.classList.add("visible");
+        inputSection.style.display = "";
+      }
+      if (successMessage) {
+        successMessage.classList.remove("visible");
+        successMessage.textContent = "Enjoy winding down!";
+      }
+    } else {
+      // If still not set, show the set key message
+      showSetThadaiConfigMessage();
+      backBtn.classList.add("hidden");
+      settingsBtn.classList.remove("hidden");
+    }
   });
 
-  saveKeyBtn.addEventListener("click", async function () {
+  // Load settings on open
+  settingsBtn.addEventListener("click", async function () {
+    // ...existing code...
+    const { THADAI_USER_PRIVATE_KEY, THADAI_CHAIN_NAME, THADAI_CHAIN_ID, THADAI_CHAIN_RPC_URL } = await chrome.storage.local.get([
+      "THADAI_USER_PRIVATE_KEY",
+      "THADAI_CHAIN_NAME",
+      "THADAI_CHAIN_ID",
+      "THADAI_CHAIN_RPC_URL"
+    ]);
+    privateKeyInput.value = THADAI_USER_PRIVATE_KEY || "";
+    chainNameInput.value = THADAI_CHAIN_NAME || "";
+    chainIdInput.value = THADAI_CHAIN_ID || "";
+    chainRpcUrlInput.value = THADAI_CHAIN_RPC_URL || "";
+  });
+
+  saveSettingsBtn.addEventListener("click", async function () {
     const key = privateKeyInput.value.trim();
+    const chainName = chainNameInput.value.trim();
+    const chainId = chainIdInput.value.trim();
+    const chainRpcUrl = chainRpcUrlInput.value.trim();
     if (!key) {
       alert("Please enter a private key.");
       return;
     }
-    await chrome.storage.local.set({ USER_PRIVATE_KEY: key });
-    alert("Private key saved.");
+    if (!chainName) {
+      alert("Please enter a chain name.");
+      return;
+    }
+    if (!chainId) {
+      alert("Please enter a chain ID.");
+      return;
+    }
+    if (!chainRpcUrl) {
+      alert("Please enter a chain RPC URL.");
+      return;
+    }
+    await chrome.storage.local.set({
+      THADAI_USER_PRIVATE_KEY: key,
+      THADAI_CHAIN_NAME: chainName,
+      THADAI_CHAIN_ID: chainId,
+      THADAI_CHAIN_RPC_URL: chainRpcUrl
+    });
+    alert("Settings saved.");
     privateKeyInput.value = "";
+    chainNameInput.value = "";
+    chainIdInput.value = "";
+    chainRpcUrlInput.value = "";
   });
 });
+
+function getPrivateKeyFromStorage() {
+  return chrome.storage.local.get("THADAI_USER_PRIVATE_KEY").then((result) => {
+    return result.THADAI_USER_PRIVATE_KEY;
+  });
+}
 
 async function updatePopupContext() {
   try {
@@ -57,14 +126,20 @@ async function updatePopupContext() {
       "popupOpenedProgrammatically"
     );
 
-    const inputSection = document.getElementById("popup-user-inputs-section");
-    const button = document.getElementById("popup-user-deposit-intent-button");
-    inputSection.classList.add("visible");
-
-    if (popupLogic.popupOpenedProgrammatically) {
-      button.textContent = "Purchase access";
+    const USER_PRIVATE_KEY = await getPrivateKeyFromStorage();
+    if (!USER_PRIVATE_KEY) {
+      showSetThadaiConfigMessage();
     } else {
-      button.textContent = "Topup access";
+      // TODO: Need to refresh the UI after coming from settings
+      const inputSection = document.getElementById("popup-user-inputs-section");
+      const button = document.getElementById("popup-user-deposit-intent-button");
+      inputSection.classList.add("visible");
+
+      if (popupLogic.popupOpenedProgrammatically) {
+        button.textContent = "Purchase access";
+      } else {
+        button.textContent = "Topup access";
+      }
     }
   } catch (error) {
     console.error("[PU] Error updateButtonText() :", error);
@@ -96,23 +171,13 @@ function getSliderAmount() {
   return amount;
 }
 
-async function executePurchaseAccess(amount) {
-  const provider = new ethers.JsonRpcProvider(CHAIN_RPC_URL);
-  const wallet = new ethers.Wallet(USER_PRIVATE_KEY, provider);
-  const contract = getThadaiContract(wallet);
-  const wei = ethers.parseEther(amount.toString());
-  const tx = await contract.purchaseAccess({ value: wei });
-  const receipt = await tx.wait();
-  console.log("[PU] purchaseAccess receipt", receipt);
-  return receipt;
-}
-
 async function userPurchaseAccess() {
   const button = document.getElementById("popup-user-deposit-intent-button");
   const originalText = showLoadingSpinner(button);
   try {
     const amount = getSliderAmount();
-    await executePurchaseAccess(amount);
+    const USER_PRIVATE_KEY = await getPrivateKeyFromStorage();
+    await executePurchaseAccess(amount, CHAIN_RPC_URL, USER_PRIVATE_KEY);
     notifyOnPurchaseAccessSuccess();
     showTransactionSuccess();
   } catch (error) {
@@ -128,7 +193,8 @@ async function userPurchaseAccess() {
       const errorMessage = await formatContractError(error, contract);
       alert("Transaction failed: " + errorMessage);
     } catch (formatError) {
-      alert("Transaction failed: " + error.message);
+      const errorMessage = await formatContractError(error);
+      alert("Transaction failed: " + errorMessage);
     }
   }
 }
@@ -138,7 +204,8 @@ async function userTopUp() {
   const originalText = showLoadingSpinner(button);
   try {
     const amount = getSliderAmount();
-    await executePurchaseAccess(amount);
+    const USER_PRIVATE_KEY = await getPrivateKeyFromStorage();
+    await executePurchaseAccess(amount, CHAIN_RPC_URL, USER_PRIVATE_KEY);
     notifyOnTopUpSuccess();
     showTransactionSuccess();
   } catch (error) {
@@ -154,9 +221,31 @@ async function userTopUp() {
       const errorMessage = await formatContractError(error, contract);
       alert("Transaction failed: " + errorMessage);
     } catch (formatError) {
-      alert("Transaction failed: " + error.message);
+      alert("Transaction failed: " + formatContractError(error));
     }
   }
+}
+
+// User-friendly contract error formatter
+function formatContractError(error) {
+  if (!error) return "Unknown error";
+  // ethers.js invalid private key
+  if (error.code === 'INVALID_ARGUMENT' && error.argument === 'privateKey') {
+    return "Your private key is invalid. Please check and re-enter it in settings.";
+  }
+  // ethers.js insufficient funds
+  if (error.code === 'INSUFFICIENT_FUNDS') {
+    return "Insufficient funds in your wallet to complete this transaction.";
+  }
+  // ethers.js revert
+  if (error.code === 'CALL_EXCEPTION' && error.reason) {
+    return `Smart contract error: ${error.reason}`;
+  }
+  // Fallback: show message or stringified error
+  if (error.message) {
+    return error.message;
+  }
+  return String(error);
 }
 
 function notifyOnPurchaseAccessSuccess() {
@@ -180,4 +269,12 @@ function notifyOnTopUpSuccess() {
     }
   });
 }
+
+// // Listen for message from settings page to re-open popup
+// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+//   if (request.type === 'OPEN_POPUP_FROM_SETTINGS') {
+//     // chrome.action.openPopup();
+//     sendResponse({ success: true });
+//   }
+// });
 

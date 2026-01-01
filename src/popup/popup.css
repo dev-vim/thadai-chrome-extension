@@ -1,3 +1,76 @@
+/* Tabs for settings page */
+.settings-tabs {
+  display: flex;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+.tab-btn {
+  flex: 1;
+  padding: 10px 0;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 16px;
+  cursor: pointer;
+  color: #333;
+  transition: border-bottom 0.2s, color 0.2s;
+}
+.tab-btn.active {
+  border-bottom: 2px solid #4CAF50;
+  color: #4CAF50;
+  font-weight: bold;
+}
+.tab-content {
+  display: block;
+}
+.tab-content.hidden {
+  display: none !important;
+}
+
+/* Managed websites section */
+.websites-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.websites-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 8px 0;
+}
+.websites-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 15px;
+}
+.remove-website-btn {
+  background: #e53935;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  padding: 3px 10px;
+  margin-left: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.2s;
+}
+.remove-website-btn:hover {
+  background: #b71c1c;
+}
+.websites-add-row {
+  display: flex;
+  gap: 8px;
+}
+.websites-add-row .settings-input {
+  flex: 1;
+}
+.websites-add-row .settings-save-btn {
+  width: auto;
+  padding: 0 16px;
+}
 /* Utility class for hiding elements */
 .hidden {
   display: none !important;
@@ -55,7 +128,7 @@
   margin-right: 8px;
 }
 
-#settings-page .settings-content {
+#popup-settings-page .settings-content {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -65,7 +138,11 @@
 body {
   text-align: center;
   width: 200px;
-  height: 220px;
+  height: 240px;
+}
+#popup-settings-page {
+  height: 380px;
+  overflow-y: auto;
 }
 
 .popup-user-inputs-section {

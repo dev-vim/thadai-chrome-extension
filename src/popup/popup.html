@@ -13,7 +13,7 @@
     <div class="popup-header">
       <span id="settings-back-btn" class="icon-btn hidden">&#8592;</span>
       <p id="popup-heading">Thadai</p>
-      <button id="settings-btn" class="icon-btn" title="Settings">
+  <button id="settings-btn" class="icon-btn" title="Settings" type="button">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4CAF50" stroke-width="2"
           stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="3" />
@@ -22,7 +22,7 @@
         </svg>
       </button>
     </div>
-    <div id="main-popup-content">
+    <div id="popup-content">
       <div class="popup-user-inputs-section" id="popup-user-inputs-section">
         <div class="amount-slider-container">
           <div class="amount-usage-hint" id="popup-usage-hint">24 min (0.0006 ETH)</div>
@@ -41,11 +41,21 @@
         Enjoy winding down!
       </div>
     </div>
-    <div id="settings-page" class="hidden">
+    <div id="popup-settings-page" class="hidden">
       <div class="settings-content">
         <label for="private-key-input" class="settings-label">Private Key</label>
         <input type="password" id="private-key-input" placeholder="Enter private key" class="settings-input" />
-        <button id="save-private-key-btn" class="settings-save-btn">Save</button>
+
+        <label for="chain-name-input" class="settings-label">Chain Name</label>
+        <input type="text" id="chain-name-input" placeholder="e.g. Ethereum Mainnet" class="settings-input" />
+
+        <label for="chain-id-input" class="settings-label">Chain ID</label>
+        <input type="number" id="chain-id-input" placeholder="e.g. 1" class="settings-input" />
+
+        <label for="chain-rpc-url-input" class="settings-label">Chain RPC URL</label>
+        <input type="text" id="chain-rpc-url-input" placeholder="e.g. https://mainnet.infura.io/v3/xxx" class="settings-input" />
+
+        <button id="save-settings-btn" class="settings-save-btn">Save Settings</button>
       </div>
     </div>
   </div>
