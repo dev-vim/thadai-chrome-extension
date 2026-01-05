@@ -1,5 +1,5 @@
-import {formatAccessTime, formatEthAmount, calculateAccessTime } from './popup-utils.js';
-import { MIN_ETH_DISPLAY } from './popup-constants.js';
+import { formatAccessTime, formatEthAmount, calculateAccessTime } from './utils.js';
+import { MIN_ETH_DISPLAY } from './constants.js';
 
 /**
  * Update the usage hint display with time and ETH amount

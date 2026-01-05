@@ -12,4 +12,3 @@ export const SLIDER_CONFIG = {
 
 // Minimum ETH display threshold
 export const MIN_ETH_DISPLAY = 0.0001;
-

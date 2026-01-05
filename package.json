@@ -1,0 +1,34 @@
+{
+  "name": "thadai-chrome-extension",
+  "displayName": "thadai-chrome-extension",
+  "version": "0.0.1",
+  "author": "**",
+  "description": "A productivity-focused Chrome extension that blocks distracting websites and uses an Ethereum smart contract as an access control engine.",
+  "type": "module",
+  "license": "MIT",
+  "keywords": [
+    "thadai-chrome-extension",
+    "vanilla",
+    "vite",
+    "create-chrome-ext"
+  ],
+  "engines": {
+    "node": ">=14.18.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "fmt": "prettier --write '**/*.{js,json,css,scss,md}'",
+    "zip": "npm run build && node src/zip.js"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "^2.0.0-beta.26",
+    "prettier": "^3.0.3",
+    "vite": "^5.4.10"
+  },
+  "dependencies": {
+    "ethers": "^6.16.0",
+    "vite-plugin-static-copy": "^3.1.4"
+  }
+}

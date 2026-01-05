@@ -1,21 +1,12 @@
-// TODO: The following won't work unless you use a roll up to bundle the script (eg. Vite)
-// Reverting to inlining the necessary component here till then
-//import { ViewPortBlocker } from './ViewPortBlocker.js'
-
-function requestTopUpForAccess() {
-    const request = { type: 'CS_REQUEST_TOPUP' }
-    chrome.runtime.sendMessage(request, (response) => {
-    })
-}
-
-const ViewPortBlocker = () => {
+const ViewPortBlocker = (unblockButtonFn) => {
     // Create the viewPortBlocker element
     let viewPortBlocker = document.createElement('div');
     viewPortBlocker.id = 'thadai-viewport-blocker';
     viewPortBlocker.style.cssText = 'position: fixed !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; z-index: 9999 !important;';
 
     // Attach shadow root
-    // Shadow DOM is a browser feature that allows you to attach a hidden, encapsulated DOM tree to an element. Styles and markup inside the shadow root are isolated from the rest of the page, preventing outside CSS from affecting your UI and vice versa.
+    // Shadow DOM is a browser feature that allows you to attach a hidden, encapsulated DOM tree to an element. 
+    // Styles and markup inside the shadow root are isolated from the rest of the page, preventing outside CSS from affecting your UI and vice versa.
     // This is ideal for browser extensions that inject UI into arbitrary websites.
     const shadow = viewPortBlocker.attachShadow({ mode: 'open' });
 
@@ -39,7 +30,7 @@ const ViewPortBlocker = () => {
         document.body.style.overflow = '';
         const viewPortBlocker = document.getElementById('thadai-viewport-blocker');
         if (viewPortBlocker) {
-            requestTopUpForAccess()
+            unblockButtonFn()
         }
     };
 
@@ -50,16 +41,26 @@ const ViewPortBlocker = () => {
     return viewPortBlocker;
 }
 
-//-----------------------------------------------------------------------------
+function requestTopUpForAccess() {
+    const request = { type: 'CS_REQUEST_TOPUP' }
+    chrome.runtime.sendMessage(request, (response) => {
+    })
+}
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.type == 'BGW_ON_ACCESS_ALLOWED') {
-        sendResponse({ success: true })
-        unblockViewPort()
+function blockViewPort() {
+    let viewPortBlocker = ViewPortBlocker(requestTopUpForAccess);
+    document.body.style.overflow = 'hidden';
+    document.body.appendChild(viewPortBlocker);
+}
+
+export function unblockViewPort() {
+    const viewPortBlocker = document.getElementById('thadai-viewport-blocker');
+    if (viewPortBlocker) {
+        viewPortBlocker.remove();
     }
-})
+}
 
-function processViewPortBlock() {
+export function processViewPortBlock() {
     const request = { type: 'CS_IS_ACCESS_ALLOWED' }
     chrome.runtime.sendMessage(request, (response) => {
         if (response && response.accessAllowed) {
@@ -69,45 +70,3 @@ function processViewPortBlock() {
         }
     })
 }
-
-function blockViewPort() {
-    let viewPortBlocker = ViewPortBlocker();
-    document.body.style.overflow = 'hidden';
-    document.body.appendChild(viewPortBlocker);
-}
-
-function unblockViewPort() {
-    const viewPortBlocker = document.getElementById('thadai-viewport-blocker');
-    if (viewPortBlocker) {
-        viewPortBlocker.remove();
-    }
-}
-
-
-const defaultWebsitesToBlock = [
-    'www.facebook.com',
-    'www.instagram.com',
-    'www.reddit.com',
-    'www.youtube.com'
-];
-const WEBSITES_KEY = 'THADAI_BLOCKED_WEBSITES';
-
-function isWebsiteBlocked(hostname, websites) {
-    return Array.isArray(websites) && websites.includes(hostname);
-}
-
-// Check storage for blocked websites and block if needed
-(async function () {
-    let websites = defaultWebsitesToBlock;
-    try {
-        const result = await chrome.storage.local.get([WEBSITES_KEY]);
-        if (Array.isArray(result[WEBSITES_KEY])) {
-            websites = result[WEBSITES_KEY];
-        }
-    } catch (e) {
-        // fallback to default
-    }
-    if (isWebsiteBlocked(window.location.hostname, websites)) {
-        processViewPortBlock();
-    }
-})();

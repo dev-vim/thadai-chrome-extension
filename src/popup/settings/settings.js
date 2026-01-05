@@ -70,10 +70,8 @@ document.addEventListener("DOMContentLoaded", async function () {
   });
 
   backBtn.addEventListener("click", function () {
+    window.close();
     chrome.runtime.sendMessage({ type: 'OPEN_POPUP_FROM_SETTINGS' }, function (response) {
-      if (response && response.success) {
-        window.close();
-      }
     });
   });
 

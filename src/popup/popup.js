@@ -1,5 +1,7 @@
-import { updateUsageHint, showLoadingSpinner, hideLoadingSpinner, showTransactionSuccess, showSetThadaiConfigMessage } from './popup-ui.js';
-import { executePurchaseAccess } from './popup-ethers.js';
+import { updateUsageHint, showLoadingSpinner, hideLoadingSpinner, showTransactionSuccess, showSetThadaiConfigMessage } from './ui.js';
+import { getThadaiContract, executePurchaseAccess } from '../core/eth/thadai-contract.js';
+import { getPrivateKeyFromStorage, getChainRpcUrlFromStorage } from '../common/session-user-data.js';
+import { formatContractError } from './utils.js';
 
 document.addEventListener("DOMContentLoaded", async function () {
   await updatePopupContext();
@@ -29,8 +31,9 @@ document.addEventListener("DOMContentLoaded", async function () {
   const chainRpcUrlInput = document.getElementById("chain-rpc-url-input");
 
   settingsBtn.addEventListener("click", function () {
+    const settingsUrl = chrome.runtime.getURL('src/popup/settings.html');
     window.open(
-      'settings.html',
+      settingsUrl,
       '_blank',
       'width=320,height=500,left=100,top=100,menubar=no,toolbar=no,location=no,status=no'
     );
@@ -66,7 +69,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // Load settings on open
   settingsBtn.addEventListener("click", async function () {
-    // ...existing code...
     const { THADAI_USER_PRIVATE_KEY, THADAI_CHAIN_NAME, THADAI_CHAIN_ID, THADAI_CHAIN_RPC_URL } = await chrome.storage.local.get([
       "THADAI_USER_PRIVATE_KEY",
       "THADAI_CHAIN_NAME",
@@ -113,12 +115,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     chainRpcUrlInput.value = "";
   });
 });
-
-function getPrivateKeyFromStorage() {
-  return chrome.storage.local.get("THADAI_USER_PRIVATE_KEY").then((result) => {
-    return result.THADAI_USER_PRIVATE_KEY;
-  });
-}
 
 async function updatePopupContext() {
   try {
@@ -177,7 +173,9 @@ async function userPurchaseAccess() {
   try {
     const amount = getSliderAmount();
     const USER_PRIVATE_KEY = await getPrivateKeyFromStorage();
-    await executePurchaseAccess(amount, CHAIN_RPC_URL, USER_PRIVATE_KEY);
+    const CHAIN_RPC_URL = await getChainRpcUrlFromStorage();
+    const receipt = await executePurchaseAccess(amount, CHAIN_RPC_URL, USER_PRIVATE_KEY);
+    console.log("[PU] purchaseAccess receipt", receipt);
     notifyOnPurchaseAccessSuccess();
     showTransactionSuccess();
   } catch (error) {
@@ -205,7 +203,9 @@ async function userTopUp() {
   try {
     const amount = getSliderAmount();
     const USER_PRIVATE_KEY = await getPrivateKeyFromStorage();
-    await executePurchaseAccess(amount, CHAIN_RPC_URL, USER_PRIVATE_KEY);
+    const CHAIN_RPC_URL = await getChainRpcUrlFromStorage();
+    const receipt = await executePurchaseAccess(amount, CHAIN_RPC_URL, USER_PRIVATE_KEY);
+    console.log("[PU] purchaseAccess receipt", receipt);
     notifyOnTopUpSuccess();
     showTransactionSuccess();
   } catch (error) {
@@ -224,28 +224,6 @@ async function userTopUp() {
       alert("Transaction failed: " + formatContractError(error));
     }
   }
-}
-
-// User-friendly contract error formatter
-function formatContractError(error) {
-  if (!error) return "Unknown error";
-  // ethers.js invalid private key
-  if (error.code === 'INVALID_ARGUMENT' && error.argument === 'privateKey') {
-    return "Your private key is invalid. Please check and re-enter it in settings.";
-  }
-  // ethers.js insufficient funds
-  if (error.code === 'INSUFFICIENT_FUNDS') {
-    return "Insufficient funds in your wallet to complete this transaction.";
-  }
-  // ethers.js revert
-  if (error.code === 'CALL_EXCEPTION' && error.reason) {
-    return `Smart contract error: ${error.reason}`;
-  }
-  // Fallback: show message or stringified error
-  if (error.message) {
-    return error.message;
-  }
-  return String(error);
 }
 
 function notifyOnPurchaseAccessSuccess() {
@@ -270,11 +248,12 @@ function notifyOnTopUpSuccess() {
   });
 }
 
-// // Listen for message from settings page to re-open popup
-// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-//   if (request.type === 'OPEN_POPUP_FROM_SETTINGS') {
-//     // chrome.action.openPopup();
-//     sendResponse({ success: true });
-//   }
-// });
+// TODO: Is this needed?
+// Listen for message from settings page to re-open popup
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.type === 'OPEN_POPUP_FROM_SETTINGS') {
+    // chrome.action.openPopup();
+    sendResponse({ success: true });
+  }
+});
 
