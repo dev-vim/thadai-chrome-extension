@@ -11,7 +11,7 @@
 // const CHAIN_RPC_URL = "http://localhost:8545";
 
 import { THADAI_ABI, THADAI_ADDRESS } from './thadai-metadata.js';
-import { Contract, JsonRpcApiProvider, parseEther } from 'ethers';
+import { Contract, JsonRpcProvider, Wallet, parseEther } from 'ethers';
 
 export function getThadaiContractAddress() {
   return THADAI_ADDRESS;
@@ -19,7 +19,7 @@ export function getThadaiContractAddress() {
 }
 
 export function getThadaiContractProvider(CHAIN_RPC_URL) {
-  return new JsonRpcApiProvider(CHAIN_RPC_URL);
+  return new JsonRpcProvider(CHAIN_RPC_URL);
 }
 
 export function getThadaiContract(signerOrProvider) {
@@ -27,8 +27,8 @@ export function getThadaiContract(signerOrProvider) {
 }
 
 export async function executePurchaseAccess(amount, chain_rpc_url, user_private_key) {
-  const provider = new ethers.JsonRpcProvider(chain_rpc_url);
-  const wallet = new ethers.Wallet(user_private_key, provider);
+  const provider = new JsonRpcProvider(chain_rpc_url);
+  const wallet = new Wallet(user_private_key, provider);
   const contract = getThadaiContract(wallet);
   const wei = parseEther(amount.toString());
   const tx = await contract.purchaseAccess({ value: wei });

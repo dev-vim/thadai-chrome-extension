@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { parseEther } from 'ethers';
 import { BASE_ACCESS_PRICE_WEI, MIN_ETH_DISPLAY } from './constants.js';
 
 /**
@@ -30,7 +30,7 @@ export function formatAccessTime(accessSeconds) {
  * @returns {number} Access time in seconds
  */
 export function calculateAccessTime(ethAmount) {
-  const weiAmount = ethers.parseEther(ethAmount.toString());
+  const weiAmount = parseEther(ethAmount.toString());
   const weiAmountNum = Number(weiAmount);
   const basePriceNum = Number(BASE_ACCESS_PRICE_WEI);
   return weiAmountNum / basePriceNum;
