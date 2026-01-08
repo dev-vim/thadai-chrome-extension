@@ -18,8 +18,8 @@ export function getThadaiContractAddress() {
 
 }
 
-export function getThadaiContractProvider(CHAIN_RPC_URL) {
-  return new JsonRpcProvider(CHAIN_RPC_URL);
+export function getThadaiContractProvider(chain_rpc_url) {
+  return new JsonRpcProvider(chain_rpc_url);
 }
 
 export function getThadaiContract(signerOrProvider) {
@@ -27,11 +27,18 @@ export function getThadaiContract(signerOrProvider) {
 }
 
 export async function executePurchaseAccess(amount, chain_rpc_url, user_private_key) {
-  const provider = new JsonRpcProvider(chain_rpc_url);
+  const provider = getThadaiContractProvider(chain_rpc_url);
   const wallet = new Wallet(user_private_key, provider);
   const contract = getThadaiContract(wallet);
   const wei = parseEther(amount.toString());
   const tx = await contract.purchaseAccess({ value: wei });
   const receipt = await tx.wait();
   return receipt;
+}
+
+export async function executeCheckAccess(chain_rpc_url, userAddress) {
+  const provider = getThadaiContractProvider(chain_rpc_url);
+  const contract = getThadaiContract(provider);
+  const [hasAccess, remainingSeconds] = await contract.checkAccess(userAddress);
+  return [hasAccess, remainingSeconds];
 }

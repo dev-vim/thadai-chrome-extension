@@ -1,4 +1,4 @@
-import { getThadaiContractProvider, getThadaiContract, getThadaiContractAddress } from '../core/eth/thadai-contract.js';
+import { executeCheckAccess } from '../core/eth/thadai-contract.js';
 import { getChainRpcUrlFromStorage, getUserAddress } from '../common/session-user-data.js';
 
 /**
@@ -7,22 +7,21 @@ import { getChainRpcUrlFromStorage, getUserAddress } from '../common/session-use
  */
 export async function isAccessAllowed() {
     try {
-        const CHAIN_RPC_URL = await getChainRpcUrlFromStorage();
-        const provider = getThadaiContractProvider(CHAIN_RPC_URL);
-        const contract = getThadaiContract(provider);
-        let userAddress;
+        let userAddress, chain_rpc_url;
         try {
+            chain_rpc_url = await getChainRpcUrlFromStorage();
             userAddress = await getUserAddress();
         } catch (error) {
-            console.log('[BGW] Error getting user address in isAccessAllowed():', error);
+            console.log('[BGW] Error retrieving user data from storage:', error);
             return false;
         }
-        const [hasAccess, remainingSeconds] = await contract.checkAccess(userAddress);
+        const [hasAccess, remainingSeconds] = await executeCheckAccess(
+            chain_rpc_url,
+            userAddress
+        );
         console.log('[BGW] Access check result:', {
             hasAccess,
-            remainingSeconds: remainingSeconds.toString(),
-            userAddress: userAddress,
-            contractAddress: getThadaiContractAddress()
+            remainingSeconds: remainingSeconds.toString()
         });
         return hasAccess;
     } catch (error) {

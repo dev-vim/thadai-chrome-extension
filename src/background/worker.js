@@ -18,7 +18,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         sendResponse({ success: true }) // unblock connection
     } else if (request.type === 'PU_ON_TOPUP_SUCCESS') {
         sendResponse({ success: true }) // unblock connection
-    } else if (request.type === 'OPEN_POPUP_FROM_SETTINGS') {
+    } else if (request.type === 'OPEN_PU_FROM_SETTINGS') {
         chrome.action.openPopup();
         sendResponse({ success: true });
     }

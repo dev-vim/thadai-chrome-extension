@@ -44,8 +44,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     const chainName = chainNameInput.value.trim();
     const chainId = chainIdInput.value.trim();
     const chainRpcUrl = chainRpcUrlInput.value.trim();
-    if (!key) {
-      alert("Please enter a private key.");
+    if (!key || !isValidPrivateKey(key)) {
+      alert("Please enter a valid private key.");
       return;
     }
     if (!chainName) {
@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   backBtn.addEventListener("click", function () {
     window.close();
-    chrome.runtime.sendMessage({ type: 'OPEN_POPUP_FROM_SETTINGS' }, function (response) {
+    chrome.runtime.sendMessage({ type: 'OPEN_PU_FROM_SETTINGS' }, function (response) {
     });
   });
 
@@ -138,3 +138,8 @@ document.addEventListener("DOMContentLoaded", async function () {
   // Initial load
   loadWebsitesList();
 });
+
+function isValidPrivateKey(key) {
+    // Must be a 0x-prefixed 64 hex chars (32 bytes)
+    return typeof key === 'string' && /^0x[0-9a-fA-F]{64}$/.test(key);
+}

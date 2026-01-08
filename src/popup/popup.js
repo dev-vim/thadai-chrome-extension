@@ -247,13 +247,3 @@ function notifyOnTopUpSuccess() {
     }
   });
 }
-
-// TODO: Is this needed?
-// Listen for message from settings page to re-open popup
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.type === 'OPEN_POPUP_FROM_SETTINGS') {
-    // chrome.action.openPopup();
-    sendResponse({ success: true });
-  }
-});
-
