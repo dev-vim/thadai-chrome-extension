@@ -1,7 +1,7 @@
 import { parseEther } from 'ethers'
 import { BASE_ACCESS_PRICE_WEI, MIN_ETH_DISPLAY } from './constants.js'
-import { getChainRpcUrlFromStorage } from '../common/session-user-data.js'
-import { getThadaiContractProvider, getThadaiContract } from '../core/eth/thadai-contract.js'
+import { getThadaiContractAbi } from '../core/eth/thadai-contract.js'
+import { ErrorDecoder } from 'ethers-decode-error'
 
 /**
  * Format time duration in a human-readable format
@@ -52,11 +52,21 @@ export function formatEthAmount(ethAmount) {
 }
 
 // User-friendly contract error formatter
-export function formatContractError(error) {
-  console.error('Contract error:', error)
+export async function formatContractError(error) {
   if (error.message === 'Failed to fetch') {
     return 'Unable to connect to the blockchain network.'
   }
-  // Fallback: show error message or stringified error
-  return error.message || String(error)
+
+  const contractAbi = getThadaiContractAbi()
+  // try {
+  const errorDecoder = ErrorDecoder.create([contractAbi])
+  const { reason, type } = await errorDecoder.decode(error)
+  if (reason === 'PaymentBelowMinimumAmount') {
+    return 'The payment amount is below the minimum required.'
+  } else if (reason === 'NoBalanceToWithdraw') {
+    return 'There is no balance available to withdraw.'
+  } else if (reason === 'WithdrawalCooldownActive') {
+    return 'Withdrawal cooldown period is still active.'
+  }
+  return error
 }

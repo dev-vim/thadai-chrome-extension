@@ -188,7 +188,8 @@ async function userPurchaseAccess() {
     if (error.message === 'Invalid amount') {
       alert('Invalid amount')
     } else {
-      alert('Purchase access failed: ' + formatContractError(error))
+      const formattedError = await formatContractError(error)
+      alert('Purchase access failed: ' + formattedError)
     }
     hidePopUpAfterDelay(100)
   }
@@ -210,7 +211,8 @@ async function userTopUp() {
     if (error.message === 'Invalid amount') {
       alert('Invalid amount')
     } else {
-      alert('User top up failed: ' + formatContractError(error))
+      const formattedError = await formatContractError(error)
+      alert('User top up failed: ' + formattedError)
     }
     hidePopUpAfterDelay(100)
   }
