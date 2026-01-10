@@ -1,7 +1,7 @@
-import { parseEther } from 'ethers';
-import { BASE_ACCESS_PRICE_WEI, MIN_ETH_DISPLAY } from './constants.js';
-import { getChainRpcUrlFromStorage } from '../common/session-user-data.js';
-import { getThadaiContractProvider, getThadaiContract } from '../core/eth/thadai-contract.js';
+import { parseEther } from 'ethers'
+import { BASE_ACCESS_PRICE_WEI, MIN_ETH_DISPLAY } from './constants.js'
+import { getChainRpcUrlFromStorage } from '../common/session-user-data.js'
+import { getThadaiContractProvider, getThadaiContract } from '../core/eth/thadai-contract.js'
 
 /**
  * Format time duration in a human-readable format
@@ -9,19 +9,19 @@ import { getThadaiContractProvider, getThadaiContract } from '../core/eth/thadai
  * @returns {string} Formatted time string (e.g., "24 min", "2 hr 15 min")
  */
 export function formatAccessTime(accessSeconds) {
-  const accessMinutes = accessSeconds / 60;
-  
+  const accessMinutes = accessSeconds / 60
+
   if (accessMinutes < 1) {
-    return `${Math.round(accessSeconds)} sec`;
+    return `${Math.round(accessSeconds)} sec`
   } else if (accessMinutes < 60) {
-    return `${Math.round(accessMinutes)} min`;
+    return `${Math.round(accessMinutes)} min`
   } else {
-    const hours = Math.floor(accessMinutes / 60);
-    const minutes = Math.round(accessMinutes % 60);
+    const hours = Math.floor(accessMinutes / 60)
+    const minutes = Math.round(accessMinutes % 60)
     if (minutes === 0) {
-      return `${hours} hr`;
+      return `${hours} hr`
     } else {
-      return `${hours} hr ${minutes} min`;
+      return `${hours} hr ${minutes} min`
     }
   }
 }
@@ -32,10 +32,10 @@ export function formatAccessTime(accessSeconds) {
  * @returns {number} Access time in seconds
  */
 export function calculateAccessTime(ethAmount) {
-  const weiAmount = parseEther(ethAmount.toString());
-  const weiAmountNum = Number(weiAmount);
-  const basePriceNum = Number(BASE_ACCESS_PRICE_WEI);
-  return weiAmountNum / basePriceNum;
+  const weiAmount = parseEther(ethAmount.toString())
+  const weiAmountNum = Number(weiAmount)
+  const basePriceNum = Number(BASE_ACCESS_PRICE_WEI)
+  return weiAmountNum / basePriceNum
 }
 
 /**
@@ -45,18 +45,18 @@ export function calculateAccessTime(ethAmount) {
  */
 export function formatEthAmount(ethAmount) {
   if (ethAmount < MIN_ETH_DISPLAY) {
-    return "~0.0001 ETH";
+    return '~0.0001 ETH'
   }
-  const ethRounded = parseFloat(ethAmount.toFixed(4));
-  return `${ethRounded.toFixed(4)} ETH`;
+  const ethRounded = parseFloat(ethAmount.toFixed(4))
+  return `${ethRounded.toFixed(4)} ETH`
 }
 
 // User-friendly contract error formatter
 export function formatContractError(error) {
-  console.error("Contract error:", error);
-  if (error.message === "Failed to fetch") {
-    return "Unable to connect to the blockchain network.";
+  console.error('Contract error:', error)
+  if (error.message === 'Failed to fetch') {
+    return 'Unable to connect to the blockchain network.'
   }
   // Fallback: show error message or stringified error
-  return error.message || String(error);
+  return error.message || String(error)
 }

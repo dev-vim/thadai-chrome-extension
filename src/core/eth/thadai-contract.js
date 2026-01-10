@@ -10,35 +10,34 @@
 // const CHAIN_ID = 31337;
 // const CHAIN_RPC_URL = "http://localhost:8545";
 
-import { THADAI_ABI, THADAI_ADDRESS } from './thadai-metadata.js';
-import { Contract, JsonRpcProvider, Wallet, parseEther } from 'ethers';
+import { THADAI_ABI, THADAI_ADDRESS } from './thadai-metadata.js'
+import { Contract, JsonRpcProvider, Wallet, parseEther } from 'ethers'
 
 export function getThadaiContractAddress() {
-  return THADAI_ADDRESS;
-
+  return THADAI_ADDRESS
 }
 
 export function getThadaiContractProvider(chain_rpc_url) {
-  return new JsonRpcProvider(chain_rpc_url);
+  return new JsonRpcProvider(chain_rpc_url)
 }
 
 export function getThadaiContract(signerOrProvider) {
-  return new Contract(THADAI_ADDRESS, THADAI_ABI, signerOrProvider);
+  return new Contract(THADAI_ADDRESS, THADAI_ABI, signerOrProvider)
 }
 
 export async function executePurchaseAccess(amount, chain_rpc_url, user_private_key) {
-  const provider = getThadaiContractProvider(chain_rpc_url);
-  const wallet = new Wallet(user_private_key, provider);
-  const contract = getThadaiContract(wallet);
-  const wei = parseEther(amount.toString());
-  const tx = await contract.purchaseAccess({ value: wei });
-  const receipt = await tx.wait();
-  return receipt;
+  const provider = getThadaiContractProvider(chain_rpc_url)
+  const wallet = new Wallet(user_private_key, provider)
+  const contract = getThadaiContract(wallet)
+  const wei = parseEther(amount.toString())
+  const tx = await contract.purchaseAccess({ value: wei })
+  const receipt = await tx.wait()
+  return receipt
 }
 
 export async function executeCheckAccess(chain_rpc_url, userAddress) {
-  const provider = getThadaiContractProvider(chain_rpc_url);
-  const contract = getThadaiContract(provider);
-  const [hasAccess, remainingSeconds] = await contract.checkAccess(userAddress);
-  return [hasAccess, remainingSeconds];
+  const provider = getThadaiContractProvider(chain_rpc_url)
+  const contract = getThadaiContract(provider)
+  const [hasAccess, remainingSeconds] = await contract.checkAccess(userAddress)
+  return [hasAccess, remainingSeconds]
 }

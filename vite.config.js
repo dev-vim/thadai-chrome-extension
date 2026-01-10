@@ -21,18 +21,18 @@ export default defineConfig(({ mode }) => {
         targets: [
           {
             src: 'src/popup/settings/settings.html',
-            dest: 'src/popup'
+            dest: 'src/popup',
           },
           {
             src: 'src/popup/settings/settings.js',
-            dest: 'src/popup'
+            dest: 'src/popup',
           },
           {
             src: 'src/popup/popup.css',
-            dest: 'src/popup'
-          }
-        ]
-      })
+            dest: 'src/popup',
+          },
+        ],
+      }),
     ],
   }
 })

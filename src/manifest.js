@@ -20,7 +20,7 @@ export default defineManifest({
   },
   background: {
     service_worker: 'src/background/worker.js',
-    type: 'module'
+    type: 'module',
   },
   content_scripts: [
     {
@@ -28,8 +28,5 @@ export default defineManifest({
       js: ['src/content/script.js'],
     },
   ],
-  "permissions": [
-    "tabs",
-    "storage"
-  ]
+  permissions: ['tabs', 'storage'],
 })

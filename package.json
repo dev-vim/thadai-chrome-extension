@@ -8,7 +8,6 @@
   "license": "MIT",
   "keywords": [
     "thadai-chrome-extension",
-    "vanilla",
     "vite",
     "create-chrome-ext"
   ],
@@ -19,8 +18,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "fmt": "prettier --write '**/*.{js,json,css,scss,md}'",
-    "zip": "npm run build && node src/zip.js"
+    "fmt": "prettier --write '**/*.{js,json,css,scss,md}'"
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "^2.0.0-beta.26",
@@ -29,6 +27,7 @@
   },
   "dependencies": {
     "ethers": "^6.16.0",
+    "ethers-decode-error": "^2.1.3",
     "vite-plugin-static-copy": "^3.1.4"
   }
 }

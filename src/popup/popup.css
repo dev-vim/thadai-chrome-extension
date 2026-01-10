@@ -13,11 +13,13 @@
   font-size: 16px;
   cursor: pointer;
   color: #333;
-  transition: border-bottom 0.2s, color 0.2s;
+  transition:
+    border-bottom 0.2s,
+    color 0.2s;
 }
 .tab-btn.active {
-  border-bottom: 2px solid #4CAF50;
-  color: #4CAF50;
+  border-bottom: 2px solid #4caf50;
+  color: #4caf50;
   font-weight: bold;
 }
 .tab-content {
@@ -92,7 +94,7 @@
 
 .settings-save-btn {
   width: 100%;
-  background: #4CAF50;
+  background: #4caf50;
   color: #fff;
   padding: 10px 0;
   border: none;
@@ -119,7 +121,7 @@
 }
 
 #settings-back-btn {
-  color: #4CAF50;
+  color: #4caf50;
   font-size: 20px;
   font-weight: bold;
   background: none;
@@ -188,7 +190,7 @@ body {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #4CAF50;
+  background: #4caf50;
   cursor: pointer;
 }
 
@@ -196,7 +198,7 @@ body {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #4CAF50;
+  background: #4caf50;
   cursor: pointer;
   border: none;
 }
@@ -230,7 +232,7 @@ body {
   height: 50px;
   border-radius: 50%;
   border: 8px solid transparent;
-  border-right-color: #4CAF50;
+  border-right-color: #4caf50;
   position: relative;
   animation: l24 1s infinite linear;
   margin: 0 auto;
@@ -239,7 +241,7 @@ body {
 
 .loader:before,
 .loader:after {
-  content: "";
+  content: '';
   position: absolute;
   inset: -8px;
   border-radius: 50%;
@@ -254,7 +256,9 @@ body {
 }
 
 @keyframes l24 {
-  100% { transform: rotate(1turn); }
+  100% {
+    transform: rotate(1turn);
+  }
 }
 
 /* Success message styles */
