@@ -1,5 +1,5 @@
-import { updateUsageHint, showLoadingSpinner, hideLoadingSpinner, showTransactionSuccess, showSetThadaiConfigMessage } from './ui.js';
-import { getThadaiContract, executePurchaseAccess } from '../core/eth/thadai-contract.js';
+import { updateUsageHint, showLoadingSpinner, hidePopUpAfterDelay, hideLoadingSpinner, showTransactionSuccess, showSetThadaiConfigMessage } from './ui.js';
+import { executePurchaseAccess } from '../core/eth/thadai-contract.js';
 import { getPrivateKeyFromStorage, getChainRpcUrlFromStorage } from '../common/session-user-data.js';
 import { formatContractError } from './utils.js';
 
@@ -126,7 +126,6 @@ async function updatePopupContext() {
     if (!USER_PRIVATE_KEY) {
       showSetThadaiConfigMessage();
     } else {
-      // TODO: Need to refresh the UI after coming from settings
       const inputSection = document.getElementById("popup-user-inputs-section");
       const button = document.getElementById("popup-user-deposit-intent-button");
       inputSection.classList.add("visible");
@@ -182,18 +181,10 @@ async function userPurchaseAccess() {
     hideLoadingSpinner(button, originalText);
     if (error.message === "Invalid amount") {
       alert("Invalid amount");
-      return;
+    } else {
+      alert("Purchase access failed: " + formatContractError(error));
     }
-    try {
-      const provider = new ethers.JsonRpcProvider(CHAIN_RPC_URL);
-      const wallet = new ethers.Wallet(USER_PRIVATE_KEY, provider);
-      const contract = getThadaiContract(wallet);
-      const errorMessage = await formatContractError(error, contract);
-      alert("Transaction failed: " + errorMessage);
-    } catch (formatError) {
-      const errorMessage = await formatContractError(error);
-      alert("Transaction failed: " + errorMessage);
-    }
+    hidePopUpAfterDelay(100);
   }
 }
 
@@ -212,17 +203,10 @@ async function userTopUp() {
     hideLoadingSpinner(button, originalText);
     if (error.message === "Invalid amount") {
       alert("Invalid amount");
-      return;
+    } else {
+      alert("User top up failed: " + formatContractError(error));
     }
-    try {
-      const provider = new ethers.JsonRpcProvider(CHAIN_RPC_URL);
-      const wallet = new ethers.Wallet(USER_PRIVATE_KEY, provider);
-      const contract = getThadaiContract(wallet);
-      const errorMessage = await formatContractError(error, contract);
-      alert("Transaction failed: " + errorMessage);
-    } catch (formatError) {
-      alert("Transaction failed: " + formatContractError(error));
-    }
+    hidePopUpAfterDelay(100);
   }
 }
 

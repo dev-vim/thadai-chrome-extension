@@ -52,7 +52,7 @@ export function hideLoadingSpinner(buttonElement, originalText) {
   buttonElement.textContent = originalText;
 }
 
-function hidePopUpAfterDelay(delayMs) {
+export function hidePopUpAfterDelay(delayMs) {
   setTimeout(() => {
     window.close();
   }, delayMs);

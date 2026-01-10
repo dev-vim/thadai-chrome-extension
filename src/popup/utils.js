@@ -1,5 +1,7 @@
 import { parseEther } from 'ethers';
 import { BASE_ACCESS_PRICE_WEI, MIN_ETH_DISPLAY } from './constants.js';
+import { getChainRpcUrlFromStorage } from '../common/session-user-data.js';
+import { getThadaiContractProvider, getThadaiContract } from '../core/eth/thadai-contract.js';
 
 /**
  * Format time duration in a human-readable format
@@ -51,22 +53,10 @@ export function formatEthAmount(ethAmount) {
 
 // User-friendly contract error formatter
 export function formatContractError(error) {
-  if (!error) return "Unknown error";
-  // ethers.js invalid private key
-  if (error.code === 'INVALID_ARGUMENT' && error.argument === 'privateKey') {
-    return "Your private key is invalid. Please check and re-enter it in settings.";
+  console.error("Contract error:", error);
+  if (error.message === "Failed to fetch") {
+    return "Unable to connect to the blockchain network.";
   }
-  // ethers.js insufficient funds
-  if (error.code === 'INSUFFICIENT_FUNDS') {
-    return "Insufficient funds in your wallet to complete this transaction.";
-  }
-  // ethers.js revert
-  if (error.code === 'CALL_EXCEPTION' && error.reason) {
-    return `Smart contract error: ${error.reason}`;
-  }
-  // Fallback: show message or stringified error
-  if (error.message) {
-    return error.message;
-  }
-  return String(error);
+  // Fallback: show error message or stringified error
+  return error.message || String(error);
 }
