@@ -1,6 +1,5 @@
 import { ethers } from 'ethers'
 
-// TODO: Remove occurence of this, NOT GOOD. Figure out an alternative - maybe encoded PK? Check other occurences too
 export function getPrivateKeyFromStorage() {
   return chrome.storage.local.get('THADAI_USER_PRIVATE_KEY').then((result) => {
     return result.THADAI_USER_PRIVATE_KEY
@@ -19,8 +18,8 @@ function isValidPrivateKey(key) {
 }
 
 export async function getUserAddress() {
-  const USER_PRIVATE_KEY = await getPrivateKeyFromStorage()
-  if (!USER_PRIVATE_KEY) throw new Error('No private key set')
-  if (!isValidPrivateKey(USER_PRIVATE_KEY)) throw new Error('Invalid private key format')
-  return ethers.computeAddress(USER_PRIVATE_KEY)
+  const userPrivateKey = await getPrivateKeyFromStorage()
+  if (!userPrivateKey) throw new Error('No private key set')
+  if (!isValidPrivateKey(userPrivateKey)) throw new Error('Invalid private key format')
+  return ethers.computeAddress(userPrivateKey)
 }

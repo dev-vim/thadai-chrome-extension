@@ -4,10 +4,10 @@ export const BASE_ACCESS_PRICE_WEI = 420875420875n
 
 // Slider configuration
 export const SLIDER_CONFIG = {
-  MIN: 0.000606, // $2 equivalent
+  MIN: 0.000607, // $2 equivalent
   MAX: 0.015152, // $50 equivalent
   STEP: 0.000001,
-  DEFAULT: 0.000606,
+  DEFAULT: 0.000607,
 }
 
 // Minimum ETH display threshold

@@ -6,8 +6,8 @@ import {
   showTransactionSuccess,
   showSetThadaiConfigMessage,
 } from './ui.js'
-import { purchaseAccess } from '../core/eth/thadai-contract.js'
-import { getPrivateKeyFromStorage, getChainRpcUrlFromStorage } from '../common/session-user-data.js'
+import { purchaseAccess, getAccessInfo } from '../core/eth/thadai-contract.js'
+import { getPrivateKeyFromStorage, getChainRpcUrlFromStorage, getUserAddress } from '../common/session-user-data.js'
 import { formatContractError } from './utils.js'
 
 document.addEventListener('DOMContentLoaded', async function () {
@@ -49,12 +49,12 @@ document.addEventListener('DOMContentLoaded', async function () {
   })
 
   backBtn.addEventListener('click', async function () {
+    const userSettingsLogic = await chrome.storage.local.get('THADAI_USER_SETTINGS_SET')
     settingsPage.classList.add('hidden')
-    const USER_PRIVATE_KEY = await getPrivateKeyFromStorage()
     const mainPopupContent = document.getElementById('popup-content')
     const inputSection = document.getElementById('popup-user-inputs-section')
     const successMessage = document.getElementById('popup-success-message')
-    if (USER_PRIVATE_KEY) {
+    if (!userSettingsLogic.THADAI_USER_SETTINGS_SET) {
       mainPopupContent.classList.remove('hidden')
       backBtn.classList.add('hidden')
       settingsBtn.classList.remove('hidden')
@@ -90,55 +90,32 @@ document.addEventListener('DOMContentLoaded', async function () {
     chainIdInput.value = THADAI_CHAIN_ID || ''
     chainRpcUrlInput.value = THADAI_CHAIN_RPC_URL || ''
   })
-
-  saveSettingsBtn.addEventListener('click', async function () {
-    const key = privateKeyInput.value.trim()
-    const chainName = chainNameInput.value.trim()
-    const chainId = chainIdInput.value.trim()
-    const chainRpcUrl = chainRpcUrlInput.value.trim()
-    if (!key) {
-      alert('Please enter a private key.')
-      return
-    }
-    if (!chainName) {
-      alert('Please enter a chain name.')
-      return
-    }
-    if (!chainId) {
-      alert('Please enter a chain ID.')
-      return
-    }
-    if (!chainRpcUrl) {
-      alert('Please enter a chain RPC URL.')
-      return
-    }
-    await chrome.storage.local.set({
-      THADAI_USER_PRIVATE_KEY: key,
-      THADAI_CHAIN_NAME: chainName,
-      THADAI_CHAIN_ID: chainId,
-      THADAI_CHAIN_RPC_URL: chainRpcUrl,
-    })
-    alert('Settings saved.')
-    privateKeyInput.value = ''
-    chainNameInput.value = ''
-    chainIdInput.value = ''
-    chainRpcUrlInput.value = ''
-  })
 })
 
 async function updatePopupContext() {
   try {
-    const popupLogic = await chrome.storage.local.get('popupOpenedProgrammatically')
-
-    const USER_PRIVATE_KEY = await getPrivateKeyFromStorage()
-    if (!USER_PRIVATE_KEY) {
+    const userSettingsLogic = await chrome.storage.local.get('THADAI_USER_SETTINGS_SET')
+    if (!userSettingsLogic.THADAI_USER_SETTINGS_SET) {
       showSetThadaiConfigMessage()
     } else {
+      const chainRpcUrl = await getChainRpcUrlFromStorage()
+      const userAddress = await getUserAddress()
+      const [accessUntil, balance, totalPaid, lastRedemptionTime, canWithdraw, cooldownRemaining] =
+        await getAccessInfo(chainRpcUrl, userAddress)
+      console.log('[BGW] getAccessInfo result: ', {
+        accessUntil: accessUntil.toString(),
+        balance: balance.toString(),
+        totalPaid: totalPaid.toString(),
+        lastRedemptionTime: lastRedemptionTime.toString(),
+        canWithdraw,
+        cooldownRemaining: cooldownRemaining.toString(),
+      })
+
       const inputSection = document.getElementById('popup-user-inputs-section')
       const button = document.getElementById('popup-user-deposit-intent-button')
       inputSection.classList.add('visible')
-
-      if (popupLogic.popupOpenedProgrammatically) {
+      const popupLogic = await chrome.storage.local.get('POPUP_OPENED_PROGRAMATICALLY')
+      if (popupLogic.POPUP_OPENED_PROGRAMATICALLY) {
         button.textContent = 'Purchase access'
       } else {
         button.textContent = 'Topup access'
@@ -151,10 +128,10 @@ async function updatePopupContext() {
 
 async function processUserDepositIntent() {
   try {
-    const popupLogic = await chrome.storage.local.get('popupOpenedProgrammatically')
-    if (popupLogic.popupOpenedProgrammatically) {
+    const popupLogic = await chrome.storage.local.get('POPUP_OPENED_PROGRAMATICALLY')
+    if (popupLogic.POPUP_OPENED_PROGRAMATICALLY) {
       await userPurchaseAccess()
-      chrome.storage.local.remove('popupOpenedProgrammatically')
+      chrome.storage.local.remove('POPUP_OPENED_PROGRAMATICALLY')
     } else {
       await userTopUp()
     }
@@ -177,9 +154,9 @@ async function userPurchaseAccess() {
   const originalText = showLoadingSpinner(button)
   try {
     const amount = getSliderAmount()
-    const USER_PRIVATE_KEY = await getPrivateKeyFromStorage()
-    const CHAIN_RPC_URL = await getChainRpcUrlFromStorage()
-    const receipt = await purchaseAccess(amount, CHAIN_RPC_URL, USER_PRIVATE_KEY)
+    const userPrivateKey = await getPrivateKeyFromStorage()
+    const chainRpcUrl = await getChainRpcUrlFromStorage()
+    const receipt = await purchaseAccess(amount, chainRpcUrl, userPrivateKey)
     console.log('[PU] purchaseAccess receipt', receipt)
     notifyOnPurchaseAccessSuccess()
     showTransactionSuccess()
@@ -200,9 +177,9 @@ async function userTopUp() {
   const originalText = showLoadingSpinner(button)
   try {
     const amount = getSliderAmount()
-    const USER_PRIVATE_KEY = await getPrivateKeyFromStorage()
-    const CHAIN_RPC_URL = await getChainRpcUrlFromStorage()
-    const receipt = await purchaseAccess(amount, CHAIN_RPC_URL, USER_PRIVATE_KEY)
+    const userPrivateKey = await getPrivateKeyFromStorage()
+    const chainRpcUrl = await getChainRpcUrlFromStorage()
+    const receipt = await purchaseAccess(amount, chainRpcUrl, userPrivateKey)
     console.log('[PU] purchaseAccess receipt', receipt)
     notifyOnTopUpSuccess()
     showTransactionSuccess()

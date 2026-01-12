@@ -13,7 +13,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     // Return true to indicate we will send a response asynchronously
     return true
   } else if (request.type == 'CS_REQUEST_TOPUP') {
-    chrome.storage.local.set({ popupOpenedProgrammatically: true })
+    chrome.storage.local.set({ POPUP_OPENED_PROGRAMATICALLY: true })
     chrome.action.openPopup()
   } else if (request.type === 'PU_ON_PURCHASE_ACCESS_SUCCESS') {
     notifyAcccessAllowed()

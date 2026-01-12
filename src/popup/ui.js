@@ -89,6 +89,6 @@ export function showSetThadaiConfigMessage() {
 
   if (successMessage) {
     successMessage.classList.add('visible')
-    successMessage.textContent = 'Please set your private key in the extension settings.'
+    successMessage.textContent = 'Kindly set up your configuration in the settings to proceed'
   }
 }

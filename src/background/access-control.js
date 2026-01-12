@@ -1,4 +1,4 @@
-import { checkAccess, getAccessInfo } from '../core/eth/thadai-contract.js'
+import { checkAccess } from '../core/eth/thadai-contract.js'
 import { getChainRpcUrlFromStorage, getUserAddress } from '../common/session-user-data.js'
 
 /**
@@ -19,16 +19,6 @@ export async function isAccessAllowed() {
     console.log('[BGW] checkAccess result:', {
       hasAccess,
       remainingSeconds: remainingSeconds.toString(),
-    })
-    const [accessUntil, balance, totalPaid, lastRedemptionTime, canWithdraw, cooldownRemaining] =
-      await getAccessInfo(chainRpcUrl, userAddress)
-    console.log('[BGW] getAccessInfo result: ', {
-      accessUntil: accessUntil.toString(),
-      balance: balance.toString(),
-      totalPaid: totalPaid.toString(),
-      lastRedemptionTime: lastRedemptionTime.toString(),
-      canWithdraw,
-      cooldownRemaining: cooldownRemaining.toString(),
     })
     return hasAccess
   } catch (error) {
