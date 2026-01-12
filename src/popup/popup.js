@@ -6,7 +6,7 @@ import {
   showTransactionSuccess,
   showSetThadaiConfigMessage,
 } from './ui.js'
-import { executePurchaseAccess } from '../core/eth/thadai-contract.js'
+import { purchaseAccess } from '../core/eth/thadai-contract.js'
 import { getPrivateKeyFromStorage, getChainRpcUrlFromStorage } from '../common/session-user-data.js'
 import { formatContractError } from './utils.js'
 
@@ -179,7 +179,7 @@ async function userPurchaseAccess() {
     const amount = getSliderAmount()
     const USER_PRIVATE_KEY = await getPrivateKeyFromStorage()
     const CHAIN_RPC_URL = await getChainRpcUrlFromStorage()
-    const receipt = await executePurchaseAccess(amount, CHAIN_RPC_URL, USER_PRIVATE_KEY)
+    const receipt = await purchaseAccess(amount, CHAIN_RPC_URL, USER_PRIVATE_KEY)
     console.log('[PU] purchaseAccess receipt', receipt)
     notifyOnPurchaseAccessSuccess()
     showTransactionSuccess()
@@ -202,7 +202,7 @@ async function userTopUp() {
     const amount = getSliderAmount()
     const USER_PRIVATE_KEY = await getPrivateKeyFromStorage()
     const CHAIN_RPC_URL = await getChainRpcUrlFromStorage()
-    const receipt = await executePurchaseAccess(amount, CHAIN_RPC_URL, USER_PRIVATE_KEY)
+    const receipt = await purchaseAccess(amount, CHAIN_RPC_URL, USER_PRIVATE_KEY)
     console.log('[PU] purchaseAccess receipt', receipt)
     notifyOnTopUpSuccess()
     showTransactionSuccess()

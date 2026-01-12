@@ -1,15 +1,3 @@
-// for Anvil testing
-// from
-// acc1 = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
-// pk1 = 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
-// to
-// acc2 = 0x70997970C51812dc3A010C7d01b50e0d17dc79C8
-// pk2 = 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
-// CHAIN STUFF
-// const CHAIN_NAME = "anvil"
-// const CHAIN_ID = 31337
-// const CHAIN_RPC_URL = "http://localhost:8545"
-
 import { THADAI_ABI, THADAI_ADDRESS } from './thadai-metadata.js'
 import { Contract, JsonRpcProvider, Wallet, parseEther } from 'ethers'
 
@@ -21,17 +9,17 @@ export function getThadaiContractAbi() {
   return THADAI_ABI
 }
 
-export function getThadaiContractProvider(chain_rpc_url) {
-  return new JsonRpcProvider(chain_rpc_url)
+export function getThadaiContractProvider(chainRpcUrl) {
+  return new JsonRpcProvider(chainRpcUrl)
 }
 
 export function getThadaiContract(signerOrProvider) {
   return new Contract(THADAI_ADDRESS, THADAI_ABI, signerOrProvider)
 }
 
-export async function executePurchaseAccess(amount, chain_rpc_url, user_private_key) {
-  const provider = getThadaiContractProvider(chain_rpc_url)
-  const wallet = new Wallet(user_private_key, provider)
+export async function purchaseAccess(amount, chainRpcUrl, userPrivateKey) {
+  const provider = getThadaiContractProvider(chainRpcUrl)
+  const wallet = new Wallet(userPrivateKey, provider)
   const contract = getThadaiContract(wallet)
   const wei = parseEther(amount.toString())
   const tx = await contract.purchaseAccess({ value: wei })
@@ -39,9 +27,17 @@ export async function executePurchaseAccess(amount, chain_rpc_url, user_private_
   return receipt
 }
 
-export async function executeCheckAccess(chain_rpc_url, userAddress) {
-  const provider = getThadaiContractProvider(chain_rpc_url)
+export async function checkAccess(chainRpcUrl, userAddress) {
+  const provider = getThadaiContractProvider(chainRpcUrl)
   const contract = getThadaiContract(provider)
   const [hasAccess, remainingSeconds] = await contract.checkAccess(userAddress)
   return [hasAccess, remainingSeconds]
+}
+
+export async function getAccessInfo(chainRpcUrl, userAddress) {
+  const provider = getThadaiContractProvider(chainRpcUrl)
+  const contract = getThadaiContract(provider)
+  const [accessUntil, balance, totalPaid, lastRedemptionTime, canWithdraw, cooldownRemaining] =
+    await contract.getUserAccessInfo(userAddress)
+  return [accessUntil, balance, totalPaid, lastRedemptionTime, canWithdraw, cooldownRemaining]
 }
