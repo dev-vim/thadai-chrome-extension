@@ -1,65 +1,58 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thadai</title>
+    <link rel="stylesheet" href="./popup.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Thadai</title>
-  <link rel="stylesheet" href="./popup.css" />
-</head>
-
-<body>
-  <div class="popup-window">
-    <div class="popup-header">
-      <span id="settings-back-btn" class="icon-btn hidden">&#8592;</span>
-      <p id="popup-heading">Thadai</p>
-  <button id="settings-btn" class="icon-btn" title="Settings" type="button">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4CAF50" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="3" />
-          <path
-            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 8 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 8a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 8 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09A1.65 1.65 0 0 0 16 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 8c.14.31.22.65.22 1v.09A1.65 1.65 0 0 0 21 12c0 .35-.08.69-.22 1z" />
-        </svg>
-      </button>
-    </div>
-    <div id="popup-content">
-      <div class="popup-user-inputs-section" id="popup-user-inputs-section">
-        <div class="amount-slider-container">
-          <div class="amount-usage-hint" id="popup-usage-hint">24 min (0.0006 ETH)</div>
-          <input id="popup-amount-slider" type="range" min="0.000607" max="0.015152" step="0.000001" value="0.000607"
-            class="amount-slider" />
-          <div class="amount-limits">
-            <span>$2</span>
-            <span>$50</span>
-          </div>
-        </div>
-        <button id="popup-user-deposit-intent-button">
-          User Deposit Intent
+  <body>
+    <div class="popup-window">
+      <div class="popup-header">
+        <span id="settings-back-btn" class="icon-btn hidden">&#8592;</span>
+        <p id="popup-heading">Thadai</p>
+        <button id="settings-btn" class="icon-btn" title="Settings" type="button">
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#4CAF50"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 8 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 8a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 8 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09A1.65 1.65 0 0 0 16 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 8c.14.31.22.65.22 1v.09A1.65 1.65 0 0 0 21 12c0 .35-.08.69-.22 1z"
+            />
+          </svg>
         </button>
       </div>
-      <div class="success-message" id="popup-success-message">
-        Enjoy winding down!
+      <div id="popup-content">
+        <div class="popup-user-inputs-section" id="popup-user-inputs-section">
+          <div class="amount-slider-container">
+            <div class="amount-usage-hint" id="popup-usage-hint">24 min (0.0006 ETH)</div>
+            <input
+              id="popup-amount-slider"
+              type="range"
+              min="0.000607"
+              max="0.015152"
+              step="0.000001"
+              value="0.000607"
+              class="amount-slider"
+            />
+            <div class="amount-limits">
+              <span>$2</span>
+              <span>$50</span>
+            </div>
+          </div>
+          <button id="popup-user-deposit-intent-button">User Deposit Intent</button>
+        </div>
+        <div class="success-message" id="popup-success-message">Enjoy winding down!</div>
       </div>
     </div>
-    <div id="popup-settings-page" class="hidden">
-      <div class="settings-content">
-        <label for="private-key-input" class="settings-label">Private Key</label>
-        <input type="password" id="private-key-input" placeholder="Enter private key" class="settings-input" />
-
-        <label for="chain-name-input" class="settings-label">Chain Name</label>
-        <input type="text" id="chain-name-input" placeholder="e.g. Ethereum Mainnet" class="settings-input" />
-
-        <label for="chain-id-input" class="settings-label">Chain ID</label>
-        <input type="number" id="chain-id-input" placeholder="e.g. 1" class="settings-input" />
-
-        <label for="chain-rpc-url-input" class="settings-label">Chain RPC URL</label>
-        <input type="text" id="chain-rpc-url-input" placeholder="e.g. https://mainnet.infura.io/v3/xxx" class="settings-input" />
-
-        <button id="save-settings-btn" class="settings-save-btn">Save Settings</button>
-      </div>
-    </div>
-  </div>
-  <script type="module" src="./popup.js"></script>
-</body>
-
+    <script type="module" src="./popup.js"></script>
+  </body>
 </html>

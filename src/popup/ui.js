@@ -63,6 +63,7 @@ export function hidePopUpAfterDelay(delayMs) {
  */
 export function showTransactionSuccess() {
   const inputSection = document.getElementById('popup-user-inputs-section')
+  // TODO: Rename this to something more appropriate (elsewhere too)
   const successMessage = document.getElementById('popup-success-message')
 
   if (inputSection) {

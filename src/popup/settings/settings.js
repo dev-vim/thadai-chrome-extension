@@ -18,15 +18,13 @@ document.addEventListener('DOMContentLoaded', async function () {
     tabContentBlockchain.classList.add('hidden')
   })
 
-  // Blockchain settings logic (existing)
   const saveSettingsBtn = document.getElementById('save-settings-btn')
   const privateKeyInput = document.getElementById('private-key-input')
   const chainNameInput = document.getElementById('chain-name-input')
   const chainIdInput = document.getElementById('chain-id-input')
   const chainRpcUrlInput = document.getElementById('chain-rpc-url-input')
   const backBtn = document.getElementById('settings-back-btn')
-
-  // Load settings on open
+  
   const { THADAI_USER_PRIVATE_KEY, THADAI_CHAIN_NAME, THADAI_CHAIN_ID, THADAI_CHAIN_RPC_URL } =
     await chrome.storage.local.get([
       'THADAI_USER_PRIVATE_KEY',
@@ -65,7 +63,7 @@ document.addEventListener('DOMContentLoaded', async function () {
       THADAI_CHAIN_NAME: chainName,
       THADAI_CHAIN_ID: chainId,
       THADAI_CHAIN_RPC_URL: chainRpcUrl,
-      THADAI_USER_SETTINGS_SET: true
+      THADAI_USER_SETTINGS_SET: true,
     })
     alert('Settings saved')
   })

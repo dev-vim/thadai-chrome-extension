@@ -7,38 +7,27 @@ import {
   showSetThadaiConfigMessage,
 } from './ui.js'
 import { purchaseAccess, getAccessInfo } from '../core/eth/thadai-contract.js'
-import { getPrivateKeyFromStorage, getChainRpcUrlFromStorage, getUserAddress } from '../common/session-user-data.js'
+import {
+  getPrivateKeyFromStorage,
+  getChainRpcUrlFromStorage,
+  getUserAddress,
+} from '../common/session-user-data.js'
 import { formatContractError } from './utils.js'
 
 document.addEventListener('DOMContentLoaded', async function () {
   await updatePopupContext()
-
-  // Setup slider
   const slider = document.getElementById('popup-amount-slider')
   const usageHint = document.getElementById('popup-usage-hint')
-
   slider.addEventListener('input', function () {
     const value = parseFloat(slider.value)
     updateUsageHint(usageHint, value)
   })
   const initialValue = parseFloat(slider.value)
   updateUsageHint(usageHint, initialValue)
-
   document
     .getElementById('popup-user-deposit-intent-button')
     .addEventListener('click', processUserDepositIntent)
-
-  // Settings button logic
   const settingsBtn = document.getElementById('settings-btn')
-  const settingsPage = document.getElementById('popup-settings-page')
-  const mainPopupContent = document.getElementById('popup-content')
-  const backBtn = document.getElementById('settings-back-btn')
-  const saveSettingsBtn = document.getElementById('save-settings-btn')
-  const privateKeyInput = document.getElementById('private-key-input')
-  const chainNameInput = document.getElementById('chain-name-input')
-  const chainIdInput = document.getElementById('chain-id-input')
-  const chainRpcUrlInput = document.getElementById('chain-rpc-url-input')
-
   settingsBtn.addEventListener('click', function () {
     const settingsUrl = chrome.runtime.getURL('src/popup/settings.html')
     window.open(
@@ -46,49 +35,6 @@ document.addEventListener('DOMContentLoaded', async function () {
       '_blank',
       'width=320,height=500,left=100,top=100,menubar=no,toolbar=no,location=no,status=no',
     )
-  })
-
-  backBtn.addEventListener('click', async function () {
-    const userSettingsLogic = await chrome.storage.local.get('THADAI_USER_SETTINGS_SET')
-    settingsPage.classList.add('hidden')
-    const mainPopupContent = document.getElementById('popup-content')
-    const inputSection = document.getElementById('popup-user-inputs-section')
-    const successMessage = document.getElementById('popup-success-message')
-    if (!userSettingsLogic.THADAI_USER_SETTINGS_SET) {
-      mainPopupContent.classList.remove('hidden')
-      backBtn.classList.add('hidden')
-      settingsBtn.classList.remove('hidden')
-      // Show the input section and hide the success message
-      if (inputSection) {
-        await updatePopupContext()
-        inputSection.classList.add('visible')
-        inputSection.style.display = ''
-      }
-      if (successMessage) {
-        successMessage.classList.remove('visible')
-        successMessage.textContent = 'Enjoy winding down!'
-      }
-    } else {
-      // If still not set, show the set key message
-      showSetThadaiConfigMessage()
-      backBtn.classList.add('hidden')
-      settingsBtn.classList.remove('hidden')
-    }
-  })
-
-  // Load settings on open
-  settingsBtn.addEventListener('click', async function () {
-    const { THADAI_USER_PRIVATE_KEY, THADAI_CHAIN_NAME, THADAI_CHAIN_ID, THADAI_CHAIN_RPC_URL } =
-      await chrome.storage.local.get([
-        'THADAI_USER_PRIVATE_KEY',
-        'THADAI_CHAIN_NAME',
-        'THADAI_CHAIN_ID',
-        'THADAI_CHAIN_RPC_URL',
-      ])
-    privateKeyInput.value = THADAI_USER_PRIVATE_KEY || ''
-    chainNameInput.value = THADAI_CHAIN_NAME || ''
-    chainIdInput.value = THADAI_CHAIN_ID || ''
-    chainRpcUrlInput.value = THADAI_CHAIN_RPC_URL || ''
   })
 })
 
@@ -122,6 +68,14 @@ async function updatePopupContext() {
       }
     }
   } catch (error) {
+    if (error.message === 'Failed to fetch') {
+      const successMessage = document.getElementById('popup-success-message')
+      if (successMessage) {
+        successMessage.classList.add('visible')
+        successMessage.textContent = 'Unable to connect to the blockchain network - check connection or configuration'
+      }
+      return
+    }
     console.error('[PU] Error updateButtonText() :', error)
   }
 }
