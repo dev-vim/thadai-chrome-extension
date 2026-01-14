@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   const chainIdInput = document.getElementById('chain-id-input')
   const chainRpcUrlInput = document.getElementById('chain-rpc-url-input')
   const backBtn = document.getElementById('settings-back-btn')
-  
+
   const { THADAI_USER_PRIVATE_KEY, THADAI_CHAIN_NAME, THADAI_CHAIN_ID, THADAI_CHAIN_RPC_URL } =
     await chrome.storage.local.get([
       'THADAI_USER_PRIVATE_KEY',

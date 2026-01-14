@@ -29,27 +29,31 @@ export function updateUsageHint(usageHintElement, ethAmount) {
 }
 
 /**
- * Show loading spinner by replacing button content
- * @param {HTMLElement} buttonElement - The button element to replace
- * @returns {string} The original button text content
+ * Show the popup spinner overlay and hide user input section
  */
-export function showLoadingSpinner(buttonElement) {
-  const originalText = buttonElement.textContent
-  buttonElement.disabled = true
-  buttonElement.classList.add('loading')
-  buttonElement.innerHTML = '<div class="loader"></div>'
-  return originalText
+export function showPopupSpinner() {
+  const inputSection = document.getElementById('popup-user-inputs-section')
+  const spinnerOverlay = document.getElementById('popup-spinner-overlay')
+  if (inputSection) {
+    inputSection.style.display = 'none'
+  }
+  if (spinnerOverlay) {
+    spinnerOverlay.style.display = 'flex'
+  }
 }
 
 /**
- * Hide loading spinner and restore button
- * @param {HTMLElement} buttonElement - The button element to restore
- * @param {string} originalText - The original button text content
+ * Hide the popup spinner overlay and show user input section
  */
-export function hideLoadingSpinner(buttonElement, originalText) {
-  buttonElement.disabled = false
-  buttonElement.classList.remove('loading')
-  buttonElement.textContent = originalText
+export function hidePopupSpinner() {
+  const inputSection = document.getElementById('popup-user-inputs-section')
+  const spinnerOverlay = document.getElementById('popup-spinner-overlay')
+  if (spinnerOverlay) {
+    spinnerOverlay.style.display = 'none'
+  }
+  if (inputSection) {
+    inputSection.style.display = 'block'
+  }
 }
 
 export function hidePopUpAfterDelay(delayMs) {
@@ -62,6 +66,7 @@ export function hidePopUpAfterDelay(delayMs) {
  * Hide payment-related elements and show success message
  */
 export function showTransactionSuccess() {
+  hidePopupSpinner()
   const inputSection = document.getElementById('popup-user-inputs-section')
   // TODO: Rename this to something more appropriate (elsewhere too)
   const successMessage = document.getElementById('popup-success-message')

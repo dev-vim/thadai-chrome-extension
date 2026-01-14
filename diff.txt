@@ -1,0 +1,376 @@
+diff --git a/src/background/worker.js b/src/background/worker.js
+index cbbcf5c..1679e42 100644
+--- a/src/background/worker.js
++++ b/src/background/worker.js
+@@ -17,9 +17,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+     chrome.action.openPopup()
+   } else if (request.type === 'PU_ON_PURCHASE_ACCESS_SUCCESS') {
+     notifyAcccessAllowed()
+-    sendResponse({ success: true }) // unblock connection
++    sendResponse({ success: true })
+   } else if (request.type === 'PU_ON_TOPUP_SUCCESS') {
+-    sendResponse({ success: true }) // unblock connection
++    sendResponse({ success: true })
+   } else if (request.type === 'OPEN_PU_FROM_SETTINGS') {
+     chrome.action.openPopup()
+     sendResponse({ success: true })
+diff --git a/src/popup/popup.css b/src/popup/popup.css
+index 9494282..5dc0748 100644
+--- a/src/popup/popup.css
++++ b/src/popup/popup.css
+@@ -217,15 +217,47 @@ body {
+   padding: 10px 15px;
+   min-height: 40px;
+   box-sizing: border-box;
++  margin-top: 10px;
++  background-color: #4caf50;
++  color: #fff;
++  border: none;
++  cursor: pointer;
+   transition: background-color 0.2s ease;
+ }
+ 
++#popup-user-deposit-intent-button:hover {
++  background-color: #45a049;
++}
++
+ #popup-user-deposit-intent-button.loading {
+   background-color: transparent;
+   border: none;
+   padding: 10px 15px;
+ }
+ 
++#popup-withdraw-balance-button {
++  width: 100%;
++  padding: 10px 15px;
++  min-height: 40px;
++  box-sizing: border-box;
++  margin-top: 10px;
++  background-color: #4caf50;
++  color: #fff;
++  border: none;
++  cursor: pointer;
++  transition: background-color 0.2s ease;
++}
++
++#popup-withdraw-balance-button:hover {
++  background-color: #45a049;
++}
++
++#popup-withdraw-balance-button.loading {
++  background-color: transparent;
++  border: none;
++  padding: 10px 15px;
++}
++
+ /* Loading spinner styles */
+ .loader {
+   width: 50px;
+@@ -251,10 +283,6 @@ body {
+   background: transparent;
+ }
+ 
+-.loader:after {
+-  animation-duration: 4s;
+-}
+-
+ @keyframes l24 {
+   100% {
+     transform: rotate(1turn);
+diff --git a/src/popup/popup.html b/src/popup/popup.html
+index 26866d4..3fe7d04 100644
+--- a/src/popup/popup.html
++++ b/src/popup/popup.html
+@@ -49,6 +49,7 @@
+             </div>
+           </div>
+           <button id="popup-user-deposit-intent-button">User Deposit Intent</button>
++          <button id="popup-withdraw-balance-button">Withdraw Balance</button>
+         </div>
+         <div class="success-message" id="popup-success-message">Enjoy winding down!</div>
+       </div>
+diff --git a/src/popup/popup.js b/src/popup/popup.js
+index a0de93d..b21d63d 100644
+--- a/src/popup/popup.js
++++ b/src/popup/popup.js
+@@ -5,6 +5,8 @@ import {
+   hideLoadingSpinner,
+   showTransactionSuccess,
+   showSetThadaiConfigMessage,
++  hideInputSection,
++  showInputSection,
+ } from './ui.js'
+ import { purchaseAccess, getAccessInfo } from '../core/eth/thadai-contract.js'
+ import {
+@@ -12,7 +14,7 @@ import {
+   getChainRpcUrlFromStorage,
+   getUserAddress,
+ } from '../common/session-user-data.js'
+-import { formatContractError } from './utils.js'
++import { formatError } from './utils.js'
+ 
+ document.addEventListener('DOMContentLoaded', async function () {
+   await updatePopupContext()
+@@ -22,11 +24,6 @@ document.addEventListener('DOMContentLoaded', async function () {
+     const value = parseFloat(slider.value)
+     updateUsageHint(usageHint, value)
+   })
+-  const initialValue = parseFloat(slider.value)
+-  updateUsageHint(usageHint, initialValue)
+-  document
+-    .getElementById('popup-user-deposit-intent-button')
+-    .addEventListener('click', processUserDepositIntent)
+   const settingsBtn = document.getElementById('settings-btn')
+   settingsBtn.addEventListener('click', function () {
+     const settingsUrl = chrome.runtime.getURL('src/popup/settings.html')
+@@ -38,6 +35,14 @@ document.addEventListener('DOMContentLoaded', async function () {
+   })
+ })
+ 
++document
++  .getElementById('popup-user-deposit-intent-button')
++  .addEventListener('click', async function () {
++    const isPurchaseAccessScenario = await chrome.storage.local.get('POPUP_OPENED_PROGRAMATICALLY')
++    processUserDepositIntent(isPurchaseAccessScenario)
++    chrome.storage.local.remove('POPUP_OPENED_PROGRAMATICALLY')
++  })
++
+ async function updatePopupContext() {
+   try {
+     const userSettingsLogic = await chrome.storage.local.get('THADAI_USER_SETTINGS_SET')
+@@ -57,6 +62,8 @@ async function updatePopupContext() {
+         cooldownRemaining: cooldownRemaining.toString(),
+       })
+ 
++      // TODO: Use canWithdraw or other info to add/remove withdraw button
++
+       const inputSection = document.getElementById('popup-user-inputs-section')
+       const button = document.getElementById('popup-user-deposit-intent-button')
+       inputSection.classList.add('visible')
+@@ -80,14 +87,31 @@ async function updatePopupContext() {
+   }
+ }
+ 
+-async function processUserDepositIntent() {
++async function processUserDepositIntent(isPurchaseAccessScenario) {
+   try {
+-    const popupLogic = await chrome.storage.local.get('POPUP_OPENED_PROGRAMATICALLY')
+-    if (popupLogic.POPUP_OPENED_PROGRAMATICALLY) {
+-      await userPurchaseAccess()
+-      chrome.storage.local.remove('POPUP_OPENED_PROGRAMATICALLY')
++    // Hide input section and show loading spinner
++    hideInputSection()
++    if (isPurchaseAccessScenario) {
++      const res = await processPurchaseAccess()
++      if (res) {
++        notifyOnPurchaseAccessSuccess()
++        showTransactionSuccess()
++        hidePopUpAfterDelay(1000)
++      } else {
++        // Hide loading spinner
++        showInputSection()
++      }
+     } else {
+-      await userTopUp()
++      const res = await processTopUp()
++      if (res) {
++        notifyOnTopUpSuccess()
++        // showTransactionSuccess()
++        // hidePopUpAfterDelay(1000)
++        showInputSection()
++      } else {
++        // Hide loading spinner
++        showInputSection()
++      }
+     }
+   } catch (error) {
+     console.error('[PU] Error processUserDepositIntent() :', error)
+@@ -103,61 +127,30 @@ function getSliderAmount() {
+   return amount
+ }
+ 
+-async function userPurchaseAccess() {
+-  const button = document.getElementById('popup-user-deposit-intent-button')
+-  const originalText = showLoadingSpinner(button)
+-  try {
+-    const amount = getSliderAmount()
+-    const userPrivateKey = await getPrivateKeyFromStorage()
+-    const chainRpcUrl = await getChainRpcUrlFromStorage()
+-    const receipt = await purchaseAccess(amount, chainRpcUrl, userPrivateKey)
+-    console.log('[PU] purchaseAccess receipt', receipt)
+-    notifyOnPurchaseAccessSuccess()
+-    showTransactionSuccess()
+-  } catch (error) {
+-    hideLoadingSpinner(button, originalText)
+-    if (error.message === 'Invalid amount') {
+-      alert('Invalid amount')
+-    } else {
+-      const formattedError = await formatContractError(error)
+-      alert('Purchase access failed: ' + formattedError)
++function notifyOnPurchaseAccessSuccess() {
++  const request = { type: 'PU_ON_PURCHASE_ACCESS_SUCCESS' }
++  chrome.runtime.sendMessage(request, (response) => {
++    if (response && !response.success) {
++      console.log(
++        '[PU] Internal error: Purchase access succeeded notification not processed as expected',
++      )
+     }
+-    hidePopUpAfterDelay(100)
+-  }
++  })
+ }
+ 
+-async function userTopUp() {
+-  const button = document.getElementById('popup-user-deposit-intent-button')
+-  const originalText = showLoadingSpinner(button)
++async function processPurchaseAccess() {
+   try {
+     const amount = getSliderAmount()
+     const userPrivateKey = await getPrivateKeyFromStorage()
+     const chainRpcUrl = await getChainRpcUrlFromStorage()
+     const receipt = await purchaseAccess(amount, chainRpcUrl, userPrivateKey)
+     console.log('[PU] purchaseAccess receipt', receipt)
+-    notifyOnTopUpSuccess()
+-    showTransactionSuccess()
++    return true
+   } catch (error) {
+-    hideLoadingSpinner(button, originalText)
+-    if (error.message === 'Invalid amount') {
+-      alert('Invalid amount')
+-    } else {
+-      const formattedError = await formatContractError(error)
+-      alert('User top up failed: ' + formattedError)
+-    }
+-    hidePopUpAfterDelay(100)
++    const formattedError = await formatError(error)
++    alert('User top up failed: ' + formattedError)
+   }
+-}
+-
+-function notifyOnPurchaseAccessSuccess() {
+-  const request = { type: 'PU_ON_PURCHASE_ACCESS_SUCCESS' }
+-  chrome.runtime.sendMessage(request, (response) => {
+-    if (response && !response.success) {
+-      console.log(
+-        '[PU] Internal error: Purchase access succeeded notification not processed as expected',
+-      )
+-    }
+-  })
++  return false
+ }
+ 
+ function notifyOnTopUpSuccess() {
+@@ -168,3 +161,18 @@ function notifyOnTopUpSuccess() {
+     }
+   })
+ }
++
++async function processTopUp() {
++  try {
++    const amount = getSliderAmount()
++    const userPrivateKey = await getPrivateKeyFromStorage()
++    const chainRpcUrl = await getChainRpcUrlFromStorage()
++    const receipt = await purchaseAccess(amount, chainRpcUrl, userPrivateKey)
++    console.log('[PU] topUp receipt', receipt)
++    return true
++  } catch (error) {
++    const formattedError = await formatError(error)
++    alert('User top up failed: ' + formattedError)
++  }
++  return false
++}
+diff --git a/src/popup/ui.js b/src/popup/ui.js
+index b95ac03..a52118a 100644
+--- a/src/popup/ui.js
++++ b/src/popup/ui.js
+@@ -8,19 +8,13 @@ import { MIN_ETH_DISPLAY } from './constants.js'
+  */
+ export function updateUsageHint(usageHintElement, ethAmount) {
+   try {
+-    // Format ETH amount
+     const ethDisplay = formatEthAmount(ethAmount)
+-
+-    // If amount is below minimum display threshold, show only ETH
+     if (ethAmount < MIN_ETH_DISPLAY) {
+       usageHintElement.textContent = ethDisplay
+       return
+     }
+-
+-    // Calculate and format access time
+     const accessSeconds = calculateAccessTime(ethAmount)
+     const timeText = formatAccessTime(accessSeconds)
+-
+     usageHintElement.textContent = `${timeText} (${ethDisplay})`
+   } catch (error) {
+     console.error('[PU] Error updating usage hint:', error)
+@@ -28,6 +22,16 @@ export function updateUsageHint(usageHintElement, ethAmount) {
+   }
+ }
+ 
++export function showInputSection() {
++  const inputSection = document.getElementById('popup-user-inputs-section')
++  inputSection.classList.add('visible')
++}
++
++export function hideInputSection() {
++  const inputSection = document.getElementById('popup-user-inputs-section')
++  inputSection.classList.remove('visible')
++}
++
+ /**
+  * Show loading spinner by replacing button content
+  * @param {HTMLElement} buttonElement - The button element to replace
+@@ -63,31 +67,24 @@ export function hidePopUpAfterDelay(delayMs) {
+  */
+ export function showTransactionSuccess() {
+   const inputSection = document.getElementById('popup-user-inputs-section')
+-  // TODO: Rename this to something more appropriate (elsewhere too)
++  // TODO: Rename this fn and element to something more appropriate (elsewhere too)
+   const successMessage = document.getElementById('popup-success-message')
+-
+   if (inputSection) {
+     inputSection.classList.remove('visible')
+     inputSection.style.display = 'none'
+   }
+-
+   if (successMessage) {
+     successMessage.classList.add('visible')
+   }
+-
+-  // Automatically close the popup after 1 second
+-  hidePopUpAfterDelay(1000)
+ }
+ 
+ export function showSetThadaiConfigMessage() {
+   const inputSection = document.getElementById('popup-user-inputs-section')
+   const successMessage = document.getElementById('popup-success-message')
+-
+   if (inputSection) {
+     inputSection.classList.remove('visible')
+     inputSection.style.display = 'none'
+   }
+-
+   if (successMessage) {
+     successMessage.classList.add('visible')
+     successMessage.textContent = 'Kindly set up your configuration in the settings to proceed'
+diff --git a/src/popup/utils.js b/src/popup/utils.js
+index 3e91276..c303a05 100644
+--- a/src/popup/utils.js
++++ b/src/popup/utils.js
+@@ -52,13 +52,13 @@ export function formatEthAmount(ethAmount) {
+ }
+ 
+ // User-friendly contract error formatter
+-export async function formatContractError(error) {
++export async function formatError(error) {
+   if (error.message === 'Failed to fetch') {
+     return 'Unable to connect to the blockchain network.'
++  } else if (error.message === 'Invalid amount') {
++    return "Invalid amount"
+   }
+-
+   const contractAbi = getThadaiContractAbi()
+-  // try {
+   const errorDecoder = ErrorDecoder.create([contractAbi])
+   const { reason, type } = await errorDecoder.decode(error)
+   if (reason === 'PaymentBelowMinimumAmount') {

@@ -1,9 +1,39 @@
+/* Spinner overlay for popup */
+.popup-spinner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.popup-spinner {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 6px solid #e0e0e0;
+  border-top: 6px solid #4caf50;
+  animation: popup-spin 1s linear infinite;
+  background: transparent;
+}
+
+@keyframes popup-spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
 /* Tabs for settings page */
 .settings-tabs {
   display: flex;
   margin-bottom: 16px;
   border-bottom: 1px solid #e0e0e0;
 }
+
 .tab-btn {
   flex: 1;
   padding: 10px 0;
@@ -17,14 +47,17 @@
     border-bottom 0.2s,
     color 0.2s;
 }
+
 .tab-btn.active {
   border-bottom: 2px solid #4caf50;
   color: #4caf50;
   font-weight: bold;
 }
+
 .tab-content {
   display: block;
 }
+
 .tab-content.hidden {
   display: none !important;
 }
@@ -35,11 +68,13 @@
   flex-direction: column;
   gap: 12px;
 }
+
 .websites-list {
   list-style: none;
   padding: 0;
   margin: 0 0 8px 0;
 }
+
 .websites-list li {
   display: flex;
   align-items: center;
@@ -48,6 +83,7 @@
   border-bottom: 1px solid #f0f0f0;
   font-size: 15px;
 }
+
 .remove-website-btn {
   background: #e53935;
   color: #fff;
@@ -59,20 +95,25 @@
   font-size: 13px;
   transition: background 0.2s;
 }
+
 .remove-website-btn:hover {
   background: #b71c1c;
 }
+
 .websites-add-row {
   display: flex;
   gap: 8px;
 }
+
 .websites-add-row .settings-input {
   flex: 1;
 }
+
 .websites-add-row .settings-save-btn {
   width: auto;
   padding: 0 16px;
 }
+
 /* Utility class for hiding elements */
 .hidden {
   display: none !important;
@@ -102,6 +143,7 @@
   font-weight: 600;
   cursor: pointer;
 }
+
 /* Popup header and icon button */
 .popup-header {
   display: flex;
@@ -142,6 +184,7 @@ body {
   width: 200px;
   height: 240px;
 }
+
 #popup-settings-page {
   height: 380px;
   overflow-y: auto;
@@ -217,10 +260,42 @@ body {
   padding: 10px 15px;
   min-height: 40px;
   box-sizing: border-box;
+  margin-top: 10px;
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
+#popup-user-deposit-intent-button:hover {
+  background-color: #45a049;
+}
+
 #popup-user-deposit-intent-button.loading {
+  background-color: transparent;
+  border: none;
+  padding: 10px 15px;
+}
+
+#popup-withdraw-balance-button {
+  width: 100%;
+  padding: 10px 15px;
+  min-height: 40px;
+  box-sizing: border-box;
+  margin-top: 10px;
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#popup-withdraw-balance-button:hover {
+  background-color: #45a049;
+}
+
+#popup-withdraw-balance-button.loading {
   background-color: transparent;
   border: none;
   padding: 10px 15px;
@@ -249,10 +324,6 @@ body {
   animation: inherit;
   animation-duration: 2s;
   background: transparent;
-}
-
-.loader:after {
-  animation-duration: 4s;
 }
 
 @keyframes l24 {

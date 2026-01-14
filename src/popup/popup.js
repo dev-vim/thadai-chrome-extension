@@ -1,8 +1,8 @@
 import {
   updateUsageHint,
-  showLoadingSpinner,
+  showPopupSpinner,
+  hidePopupSpinner,
   hidePopUpAfterDelay,
-  hideLoadingSpinner,
   showTransactionSuccess,
   showSetThadaiConfigMessage,
 } from './ui.js'
@@ -72,7 +72,8 @@ async function updatePopupContext() {
       const successMessage = document.getElementById('popup-success-message')
       if (successMessage) {
         successMessage.classList.add('visible')
-        successMessage.textContent = 'Unable to connect to the blockchain network - check connection or configuration'
+        successMessage.textContent =
+          'Unable to connect to the blockchain network - check connection or configuration'
       }
       return
     }
@@ -105,7 +106,7 @@ function getSliderAmount() {
 
 async function userPurchaseAccess() {
   const button = document.getElementById('popup-user-deposit-intent-button')
-  const originalText = showLoadingSpinner(button)
+  showPopupSpinner()
   try {
     const amount = getSliderAmount()
     const userPrivateKey = await getPrivateKeyFromStorage()
@@ -115,7 +116,7 @@ async function userPurchaseAccess() {
     notifyOnPurchaseAccessSuccess()
     showTransactionSuccess()
   } catch (error) {
-    hideLoadingSpinner(button, originalText)
+    hidePopupSpinner()
     if (error.message === 'Invalid amount') {
       alert('Invalid amount')
     } else {
@@ -128,7 +129,7 @@ async function userPurchaseAccess() {
 
 async function userTopUp() {
   const button = document.getElementById('popup-user-deposit-intent-button')
-  const originalText = showLoadingSpinner(button)
+  showPopupSpinner()
   try {
     const amount = getSliderAmount()
     const userPrivateKey = await getPrivateKeyFromStorage()
@@ -138,7 +139,7 @@ async function userTopUp() {
     notifyOnTopUpSuccess()
     showTransactionSuccess()
   } catch (error) {
-    hideLoadingSpinner(button, originalText)
+    hidePopupSpinner()
     if (error.message === 'Invalid amount') {
       alert('Invalid amount')
     } else {
