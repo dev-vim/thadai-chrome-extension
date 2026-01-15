@@ -34,6 +34,15 @@ export async function checkAccess(chainRpcUrl, userAddress) {
   return [hasAccess, remainingSeconds]
 }
 
+export async function withdrawFunds(chainRpcUrl, userPrivateKey) {
+  const provider = getThadaiContractProvider(chainRpcUrl)
+  const wallet = new Wallet(userPrivateKey, provider)
+  const contract = getThadaiContract(wallet)
+  const tx = await contract.withdrawFunds()
+  const receipt = await tx.wait()
+  return receipt
+}
+
 export async function getAccessInfo(chainRpcUrl, userAddress) {
   const provider = getThadaiContractProvider(chainRpcUrl)
   const contract = getThadaiContract(provider)

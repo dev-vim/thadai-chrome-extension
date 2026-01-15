@@ -7,14 +7,8 @@ import { getChainRpcUrlFromStorage, getUserAddress } from '../common/session-use
  */
 export async function isAccessAllowed() {
   try {
-    let userAddress, chainRpcUrl
-    try {
-      chainRpcUrl = await getChainRpcUrlFromStorage()
-      userAddress = await getUserAddress()
-    } catch (error) {
-      console.log('[BGW] Error retrieving user data from storage:', error)
-      return false
-    }
+    const chainRpcUrl = await getChainRpcUrlFromStorage()
+    const userAddress = await getUserAddress()
     const [hasAccess, remainingSeconds] = await checkAccess(chainRpcUrl, userAddress)
     console.log('[BGW] checkAccess result:', {
       hasAccess,

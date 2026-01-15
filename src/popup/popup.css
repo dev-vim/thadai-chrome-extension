@@ -278,7 +278,7 @@ body {
   padding: 10px 15px;
 }
 
-#popup-withdraw-balance-button {
+#popup-user-withdraw-intent-button {
   width: 100%;
   padding: 10px 15px;
   min-height: 40px;
@@ -291,11 +291,11 @@ body {
   transition: background-color 0.2s ease;
 }
 
-#popup-withdraw-balance-button:hover {
+#popup-user-withdraw-intent-button:hover {
   background-color: #45a049;
 }
 
-#popup-withdraw-balance-button.loading {
+#popup-user-withdraw-intent-button.loading {
   background-color: transparent;
   border: none;
   padding: 10px 15px;

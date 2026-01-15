@@ -2,11 +2,10 @@ import {
   updateUsageHint,
   showPopupSpinner,
   hidePopupSpinner,
-  hidePopUpAfterDelay,
   showTransactionSuccess,
   showSetThadaiConfigMessage,
 } from './ui.js'
-import { purchaseAccess, getAccessInfo } from '../core/eth/thadai-contract.js'
+import { purchaseAccess, withdrawFunds, getAccessInfo } from '../core/eth/thadai-contract.js'
 import {
   getPrivateKeyFromStorage,
   getChainRpcUrlFromStorage,
@@ -16,17 +15,22 @@ import { formatContractError } from './utils.js'
 
 document.addEventListener('DOMContentLoaded', async function () {
   await updatePopupContext()
-  const slider = document.getElementById('popup-amount-slider')
-  const usageHint = document.getElementById('popup-usage-hint')
-  slider.addEventListener('input', function () {
-    const value = parseFloat(slider.value)
-    updateUsageHint(usageHint, value)
+  const chainRpcUrl = await getChainRpcUrlFromStorage()
+  const userAddress = await getUserAddress()
+  const [accessUntil, balance, totalPaid, lastRedemptionTime, canWithdraw, cooldownRemaining] =
+    await getAccessInfo(chainRpcUrl, userAddress)
+  console.log('[PU] getAccessInfo: ', {
+    accessUntil: accessUntil.toString(),
+    balance: balance.toString(),
+    totalPaid: totalPaid.toString(),
+    lastRedemptionTime: lastRedemptionTime.toString(),
+    canWithdraw,
+    cooldownRemaining: cooldownRemaining.toString(),
   })
-  const initialValue = parseFloat(slider.value)
-  updateUsageHint(usageHint, initialValue)
-  document
-    .getElementById('popup-user-deposit-intent-button')
-    .addEventListener('click', processUserDepositIntent)
+  if (!canWithdraw) {
+    const withdrawButton = document.getElementById('popup-user-withdraw-intent-button')
+    withdrawButton.style.display = 'none'
+  }
   const settingsBtn = document.getElementById('settings-btn')
   settingsBtn.addEventListener('click', function () {
     const settingsUrl = chrome.runtime.getURL('src/popup/settings.html')
@@ -38,25 +42,26 @@ document.addEventListener('DOMContentLoaded', async function () {
   })
 })
 
+document.getElementById('popup-amount-slider').addEventListener('input', function () {
+  const slider = document.getElementById('popup-amount-slider')
+  const value = parseFloat(slider.value)
+  updateUsageHint(value)
+})
+
+document
+  .getElementById('popup-user-deposit-intent-button')
+  .addEventListener('click', processUserDepositIntent)
+
+document
+  .getElementById('popup-user-withdraw-intent-button')
+  .addEventListener('click', processUserWithdrawIntent)
+
 async function updatePopupContext() {
   try {
     const userSettingsLogic = await chrome.storage.local.get('THADAI_USER_SETTINGS_SET')
     if (!userSettingsLogic.THADAI_USER_SETTINGS_SET) {
       showSetThadaiConfigMessage()
     } else {
-      const chainRpcUrl = await getChainRpcUrlFromStorage()
-      const userAddress = await getUserAddress()
-      const [accessUntil, balance, totalPaid, lastRedemptionTime, canWithdraw, cooldownRemaining] =
-        await getAccessInfo(chainRpcUrl, userAddress)
-      console.log('[BGW] getAccessInfo result: ', {
-        accessUntil: accessUntil.toString(),
-        balance: balance.toString(),
-        totalPaid: totalPaid.toString(),
-        lastRedemptionTime: lastRedemptionTime.toString(),
-        canWithdraw,
-        cooldownRemaining: cooldownRemaining.toString(),
-      })
-
       const inputSection = document.getElementById('popup-user-inputs-section')
       const button = document.getElementById('popup-user-deposit-intent-button')
       inputSection.classList.add('visible')
@@ -86,12 +91,36 @@ async function processUserDepositIntent() {
     const popupLogic = await chrome.storage.local.get('POPUP_OPENED_PROGRAMATICALLY')
     if (popupLogic.POPUP_OPENED_PROGRAMATICALLY) {
       await userPurchaseAccess()
+      // TODO: collect the return value of the op, if success then hide popup after a delay
       chrome.storage.local.remove('POPUP_OPENED_PROGRAMATICALLY')
     } else {
       await userTopUp()
+      // TODO: collect the return value of the op, if success then hide popup after a delay
     }
   } catch (error) {
     console.error('[PU] Error processUserDepositIntent() :', error)
+  }
+}
+
+async function processUserWithdrawIntent() {
+  const chainRpcUrl = await getChainRpcUrlFromStorage()
+  const userAddress = await getUserAddress()
+  const [, , , , canWithdraw] = await getAccessInfo(chainRpcUrl, userAddress)
+  if (!canWithdraw) {
+    alert('Withdrawal not allowed at this time. Please check your balance and cooldown period.')
+    return
+  }
+  showPopupSpinner()
+  try {
+    const userPrivateKey = await getPrivateKeyFromStorage()
+    const receipt = await withdrawFunds(chainRpcUrl, userPrivateKey)
+    console.log('[PU] withdrawFunds receipt', receipt)
+    alert('Withdrawal successful!')
+    showTransactionSuccess()
+  } catch (error) {
+    hidePopupSpinner()
+    const formattedError = await formatContractError(error)
+    alert('Withdrawal failed: ' + formattedError)
   }
 }
 
@@ -123,30 +152,6 @@ async function userPurchaseAccess() {
       const formattedError = await formatContractError(error)
       alert('Purchase access failed: ' + formattedError)
     }
-    hidePopUpAfterDelay(100)
-  }
-}
-
-async function userTopUp() {
-  const button = document.getElementById('popup-user-deposit-intent-button')
-  showPopupSpinner()
-  try {
-    const amount = getSliderAmount()
-    const userPrivateKey = await getPrivateKeyFromStorage()
-    const chainRpcUrl = await getChainRpcUrlFromStorage()
-    const receipt = await purchaseAccess(amount, chainRpcUrl, userPrivateKey)
-    console.log('[PU] purchaseAccess receipt', receipt)
-    notifyOnTopUpSuccess()
-    showTransactionSuccess()
-  } catch (error) {
-    hidePopupSpinner()
-    if (error.message === 'Invalid amount') {
-      alert('Invalid amount')
-    } else {
-      const formattedError = await formatContractError(error)
-      alert('User top up failed: ' + formattedError)
-    }
-    hidePopUpAfterDelay(100)
   }
 }
 
@@ -159,6 +164,28 @@ function notifyOnPurchaseAccessSuccess() {
       )
     }
   })
+}
+
+async function userTopUp() {
+  const button = document.getElementById('popup-user-deposit-intent-button')
+  showPopupSpinner()
+  try {
+    const amount = getSliderAmount()
+    const userPrivateKey = await getPrivateKeyFromStorage()
+    const chainRpcUrl = await getChainRpcUrlFromStorage()
+    const receipt = await purchaseAccess(amount, chainRpcUrl, userPrivateKey)
+    console.log('[PU] topUp receipt', receipt)
+    notifyOnTopUpSuccess()
+    showTransactionSuccess()
+  } catch (error) {
+    hidePopupSpinner()
+    if (error.message === 'Invalid amount') {
+      alert('Invalid amount')
+    } else {
+      const formattedError = await formatContractError(error)
+      alert('User top up failed: ' + formattedError)
+    }
+  }
 }
 
 function notifyOnTopUpSuccess() {

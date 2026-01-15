@@ -6,21 +6,16 @@ import { MIN_ETH_DISPLAY } from './constants.js'
  * @param {HTMLElement} usageHintElement - The element to update
  * @param {number} ethAmount - Amount in ETH
  */
-export function updateUsageHint(usageHintElement, ethAmount) {
+export function updateUsageHint(ethAmount) {
   try {
-    // Format ETH amount
+    const usageHintElement = document.getElementById('popup-usage-hint')
     const ethDisplay = formatEthAmount(ethAmount)
-
-    // If amount is below minimum display threshold, show only ETH
     if (ethAmount < MIN_ETH_DISPLAY) {
       usageHintElement.textContent = ethDisplay
       return
     }
-
-    // Calculate and format access time
     const accessSeconds = calculateAccessTime(ethAmount)
     const timeText = formatAccessTime(accessSeconds)
-
     usageHintElement.textContent = `${timeText} (${ethDisplay})`
   } catch (error) {
     console.error('[PU] Error updating usage hint:', error)
