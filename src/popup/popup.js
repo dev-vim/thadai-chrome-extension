@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     window.open(
       settingsUrl,
       '_blank',
-      'width=320,height=500,left=100,top=100,menubar=no,toolbar=no,location=no,status=no',
+      'width=330,height=500,left=100,top=100,menubar=no,toolbar=no,location=no,status=no',
     )
   })
 })

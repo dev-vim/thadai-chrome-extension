@@ -28,6 +28,10 @@ export default defineConfig(({ mode }) => {
             dest: 'src/popup',
           },
           {
+            src: 'src/popup/settings/settings.css',
+            dest: 'src/popup',
+          },
+          {
             src: 'src/popup/popup.css',
             dest: 'src/popup',
           },

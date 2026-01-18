@@ -4,18 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Thadai Settings</title>
-    <link rel="stylesheet" href="./popup.css" />
+    <link rel="stylesheet" href="./settings.css" />
   </head>
   <body>
     <div class="popup-window">
       <div class="popup-header">
-        <span id="settings-back-btn" class="icon-btn">&#8592;</span>
-        <p id="popup-heading">Settings</p>
+        <button id="settings-back-btn" class="icon-btn" title="Back" type="button">&#8617;</button>
       </div>
       <div id="popup-settings-page">
         <div class="settings-tabs">
-          <button class="tab-btn active" id="tab-blockchain">Blockchain Settings</button>
-          <button class="tab-btn" id="tab-websites">Managed Websites</button>
+          <button class="tab-btn active" id="tab-blockchain-settings">Blockchain Settings</button>
+          <button class="tab-btn" id="tab-websites">Blocked Websites</button>
         </div>
         <div class="tab-content" id="tab-content-blockchain">
           <div class="settings-content">
@@ -27,7 +26,7 @@
               class="settings-input"
             />
 
-            <label for="chain-name-input" class="settings-label">Chain Name</label>
+            <label for="chain-name-input" class="settings-label">Blockchain Name</label>
             <input
               type="text"
               id="chain-name-input"
@@ -35,10 +34,10 @@
               class="settings-input"
             />
 
-            <label for="chain-id-input" class="settings-label">Chain ID</label>
+            <label for="chain-id-input" class="settings-label">Blockchain ID</label>
             <input type="number" id="chain-id-input" placeholder="e.g. 1" class="settings-input" />
 
-            <label for="chain-rpc-url-input" class="settings-label">Chain RPC URL</label>
+            <label for="chain-rpc-url-input" class="settings-label">Blockchain RPC URL</label>
             <input
               type="text"
               id="chain-rpc-url-input"
@@ -51,7 +50,6 @@
         </div>
         <div class="tab-content hidden" id="tab-content-websites">
           <div class="websites-content">
-            <label class="settings-label">Blocked Websites</label>
             <ul id="blocked-websites-list" class="websites-list">
               <!-- Example list item: <li>www.facebook.com <button class='remove-website-btn'>Remove</button></li> -->
             </ul>

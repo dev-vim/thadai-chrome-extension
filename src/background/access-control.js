@@ -16,8 +16,11 @@ export async function isAccessAllowed() {
     })
     return hasAccess
   } catch (error) {
-    console.error('[BGW] Error in isAccessAllowed():', error)
-    // Return false on error to be safe (block access if we can't verify)
+    if (error.message == "Failed to fetch") {
+      console.error('[BGW] Network error: Unable to reach the RPC URL. Please check your internet connection or the RPC URL configuration.')
+    } else {
+      console.error('[BGW] Error in isAccessAllowed():', error)
+    }
     return false
   }
 }

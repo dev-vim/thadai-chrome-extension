@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', async function () {
   // Tab logic
-  const tabBlockchain = document.getElementById('tab-blockchain')
+  const tabBlockchain = document.getElementById('tab-blockchain-settings')
   const tabWebsites = document.getElementById('tab-websites')
   const tabContentBlockchain = document.getElementById('tab-content-blockchain')
   const tabContentWebsites = document.getElementById('tab-content-websites')
