@@ -46,13 +46,13 @@ const ViewPortBlocker = (unblockButtonFn) => {
   return viewPortBlocker
 }
 
-function requestTopUpForAccess() {
+function requestTopupForAccess() {
   const request = { type: 'CS_REQUEST_TOPUP' }
   chrome.runtime.sendMessage(request, (response) => {})
 }
 
 function blockViewPort() {
-  let viewPortBlocker = ViewPortBlocker(requestTopUpForAccess)
+  let viewPortBlocker = ViewPortBlocker(requestTopupForAccess)
   document.body.style.overflow = 'hidden'
   document.body.appendChild(viewPortBlocker)
 }

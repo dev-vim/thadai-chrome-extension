@@ -63,7 +63,6 @@ document.addEventListener('DOMContentLoaded', async function () {
       THADAI_CHAIN_NAME: chainName,
       THADAI_CHAIN_ID: chainId,
       THADAI_CHAIN_RPC_URL: chainRpcUrl,
-      THADAI_USER_SETTINGS_SET: true,
     })
     alert('Settings saved')
   })

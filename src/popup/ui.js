@@ -1,11 +1,6 @@
 import { formatAccessTime, formatEthAmount, calculateAccessTime } from './utils.js'
 import { MIN_ETH_DISPLAY } from './constants.js'
 
-/**
- * Update the usage hint display with time and ETH amount
- * @param {HTMLElement} usageHintElement - The element to update
- * @param {number} ethAmount - Amount in ETH
- */
 export function updateUsageHint(ethAmount) {
   try {
     const usageHintElement = document.getElementById('popup-usage-hint')
@@ -23,73 +18,68 @@ export function updateUsageHint(ethAmount) {
   }
 }
 
-/**
- * Show the popup spinner overlay and hide user input section
- */
-export function showPopupSpinner() {
+export function showInputSection() {
   const inputSection = document.getElementById('popup-user-inputs-section')
-  const spinnerOverlay = document.getElementById('popup-spinner-overlay')
-  if (inputSection) {
-    inputSection.style.display = 'none'
-  }
-  if (spinnerOverlay) {
-    spinnerOverlay.style.display = 'flex'
-  }
-}
-
-/**
- * Hide the popup spinner overlay and show user input section
- */
-export function hidePopupSpinner() {
-  const inputSection = document.getElementById('popup-user-inputs-section')
-  const spinnerOverlay = document.getElementById('popup-spinner-overlay')
-  if (spinnerOverlay) {
-    spinnerOverlay.style.display = 'none'
-  }
   if (inputSection) {
     inputSection.style.display = 'block'
   }
 }
 
-export function hidePopUpAfterDelay(delayMs) {
+export function hideInputSection() {
+  const inputSection = document.getElementById('popup-user-inputs-section')
+  if (inputSection) {
+    inputSection.style.display = 'none'
+  }
+}
+
+export function showSpinner() {
+  const spinnerOverlay = document.getElementById('popup-spinner-overlay')
+  if (spinnerOverlay) {
+    spinnerOverlay.style.display = 'flex'
+  }
+}
+
+export function hideSpinner() {
+  const spinnerOverlay = document.getElementById('popup-spinner-overlay')
+  if (spinnerOverlay) {
+    spinnerOverlay.style.display = 'none'
+  }
+}
+
+export function hidePopupAfterDelay(delayMs) {
   setTimeout(() => {
     window.close()
   }, delayMs)
 }
 
-/**
- * Hide payment-related elements and show success message
- */
-export function showTransactionSuccess() {
-  hidePopupSpinner()
-  const inputSection = document.getElementById('popup-user-inputs-section')
-  // TODO: Rename this to something more appropriate (elsewhere too)
-  const successMessage = document.getElementById('popup-success-message')
-
-  if (inputSection) {
-    inputSection.classList.remove('visible')
-    inputSection.style.display = 'none'
+export async function setUserDepositIntentButtonText() {
+  const button = document.getElementById('popup-user-deposit-intent-button')
+  const popupLogic = await chrome.storage.local.get('POPUP_OPENED_PROGRAMATICALLY')
+  if (popupLogic.POPUP_OPENED_PROGRAMATICALLY) {
+    button.textContent = 'Purchase access'
+  } else {
+    button.textContent = 'Topup access'
   }
-
-  if (successMessage) {
-    successMessage.classList.add('visible')
-  }
-
-  // Automatically close the popup after 1 second
-  hidePopUpAfterDelay(1000)
 }
 
-export function showSetThadaiConfigMessage() {
-  const inputSection = document.getElementById('popup-user-inputs-section')
-  const successMessage = document.getElementById('popup-success-message')
-
-  if (inputSection) {
-    inputSection.classList.remove('visible')
-    inputSection.style.display = 'none'
+function displayBannerMessage(message) {
+  const banner = document.getElementById('popup-banner-message')
+  if (banner) {
+    banner.textContent = message
+    banner.classList.add('visible')
   }
+}
 
-  if (successMessage) {
-    successMessage.classList.add('visible')
-    successMessage.textContent = 'Kindly set up your configuration in the settings to proceed'
-  }
+export function displayTransactionSuccessMessage() {
+  displayBannerMessage('Transaction successful! Enjoy winding down')
+}
+
+export function displaySetConfigurationMessage() {
+  displayBannerMessage('Kindly set up your configuration in the settings to proceed')
+}
+
+export function displayConnectionIssueMessage() {
+  displayBannerMessage(
+    'Unable to connect to the blockchain network - check connection or configuration',
+  )
 }

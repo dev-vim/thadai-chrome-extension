@@ -1,5 +1,16 @@
 import { ethers } from 'ethers'
 
+export function isThadaiConfigurationSet() {
+  return Promise.all([
+    chrome.storage.local.get('THADAI_USER_PRIVATE_KEY'),
+    chrome.storage.local.get('THADAI_CHAIN_RPC_URL'),
+  ]).then(([privateKeyResult, rpcUrlResult]) => {
+    const privateKey = privateKeyResult.THADAI_USER_PRIVATE_KEY
+    const rpcUrl = rpcUrlResult.THADAI_CHAIN_RPC_URL
+    return Boolean(privateKey && rpcUrl)
+  })
+}
+
 export function getPrivateKeyFromStorage() {
   return chrome.storage.local.get('THADAI_USER_PRIVATE_KEY').then((result) => {
     return result.THADAI_USER_PRIVATE_KEY

@@ -51,16 +51,16 @@ export function formatEthAmount(ethAmount) {
   return `${ethRounded.toFixed(4)} ETH`
 }
 
-// User-friendly contract error formatter
 export async function formatContractError(error) {
   if (error.message === 'Failed to fetch') {
     return 'Unable to connect to the blockchain network.'
   }
-
   const contractAbi = getThadaiContractAbi()
-  // try {
   const errorDecoder = ErrorDecoder.create([contractAbi])
   const { reason, type } = await errorDecoder.decode(error)
+
+  // TODO: Handle insufficient funds error
+
   if (reason === 'PaymentBelowMinimumAmount') {
     return 'The payment amount is below the minimum required.'
   } else if (reason === 'NoBalanceToWithdraw') {

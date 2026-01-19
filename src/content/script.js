@@ -1,6 +1,6 @@
 import { unblockViewPort, processViewPortBlock } from './viewport/viewport-ops.js'
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
   if (request.type == 'BGW_ON_ACCESS_ALLOWED') {
     sendResponse({ success: true })
     unblockViewPort()
@@ -15,7 +15,7 @@ const defaultWebsitesToBlock = [
 ]
 const WEBSITES_KEY = 'THADAI_BLOCKED_WEBSITES'
 
-function isWebsiteBlocked(hostname, websites) {
+function isWebsiteToBeBlocked(hostname, websites) {
   return Array.isArray(websites) && websites.includes(hostname)
 }
 
@@ -30,7 +30,7 @@ function isWebsiteBlocked(hostname, websites) {
   } catch (e) {
     // fallback to default
   }
-  if (isWebsiteBlocked(window.location.hostname, websites)) {
+  if (isWebsiteToBeBlocked(window.location.hostname, websites)) {
     processViewPortBlock()
   }
 })()
