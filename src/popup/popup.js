@@ -24,8 +24,8 @@ document.addEventListener('DOMContentLoaded', async function () {
   if (!isConfigurationSet) {
     hideInputSection()
     displaySetConfigurationMessage()
-  } else {
-    await updatePopupContext()
+  }
+  try {
     const chainRpcUrl = await getChainRpcUrlFromStorage()
     const userAddress = await getUserAddress()
     const [accessUntil, balance, totalPaid, lastRedemptionTime, canWithdraw, cooldownRemaining] =
@@ -38,10 +38,15 @@ document.addEventListener('DOMContentLoaded', async function () {
       canWithdraw,
       cooldownRemaining: cooldownRemaining.toString(),
     })
+    showInputSection()
+    await setUserDepositIntentButtonText()
     if (!canWithdraw) {
       const withdrawButton = document.getElementById('popup-user-withdraw-intent-button')
       withdrawButton.style.display = 'none'
     }
+  } catch (error) {
+    hideInputSection()
+    displayConnectionIssueMessage()
   }
 })
 
@@ -67,25 +72,6 @@ document
 document
   .getElementById('popup-user-withdraw-intent-button')
   .addEventListener('click', processUserWithdrawIntent)
-
-async function updatePopupContext() {
-  try {
-    const isConfigurationSet = await isThadaiConfigurationSet()
-    if (!isConfigurationSet) {
-      hideInputSection()
-      displaySetConfigurationMessage()
-    } else {
-      showInputSection()
-      await setUserDepositIntentButtonText()
-    }
-  } catch (error) {
-    if (error.message === 'Failed to fetch') {
-      displayConnectionIssueMessage()
-      return
-    }
-    console.error('[PU] Error updateButtonText() :', error)
-  }
-}
 
 async function processUserDepositIntent() {
   try {
