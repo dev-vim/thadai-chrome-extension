@@ -9,15 +9,21 @@ import {
   displayTransactionSuccessMessage,
   displaySetConfigurationMessage,
   displayConnectionIssueMessage,
+  updateAmountSliderRange,
 } from './ui.js'
-import { purchaseAccess, withdrawFunds, getAccessInfo } from '../core/eth/thadai-contract.js'
+import {
+  purchaseAccess,
+  withdrawFunds,
+  getAccessInfo,
+  getAccessPricingInfo,
+} from '../core/eth/thadai-contract.js'
 import {
   isThadaiConfigurationSet,
   getPrivateKeyFromStorage,
   getChainRpcUrlFromStorage,
   getUserAddress,
 } from '../common/session-user-data.js'
-import { formatContractError } from './utils.js'
+import { formatContractError, convertWeiToEth } from './utils.js'
 
 document.addEventListener('DOMContentLoaded', async function () {
   const isConfigurationSet = await isThadaiConfigurationSet()
@@ -28,17 +34,45 @@ document.addEventListener('DOMContentLoaded', async function () {
   try {
     const chainRpcUrl = await getChainRpcUrlFromStorage()
     const userAddress = await getUserAddress()
-    const [accessUntil, balance, totalPaid, lastRedemptionTime, canWithdraw, cooldownRemaining] =
-      await getAccessInfo(chainRpcUrl, userAddress)
-    console.log('[PU] getAccessInfo: ', {
-      accessUntil: accessUntil.toString(),
-      balance: balance.toString(),
-      totalPaid: totalPaid.toString(),
-      lastRedemptionTime: lastRedemptionTime.toString(),
+    const [
+      balance,
+      accessUntil,
+      lastPurchaseTime,
+      lastRedemptionTime,
+      totalAccessSecondsPurchased,
+      totalPaid,
       canWithdraw,
+      cooldownRemaining,
+      applicableInflationPercent,
+    ] = await getAccessInfo(chainRpcUrl, userAddress)
+    console.log('[PU] getAccessInfo: ', {
+      balance: balance.toString(),
+      accessUntil: accessUntil.toString(),
+      lastPurchaseTime: lastPurchaseTime.toString(),
+      lastRedemptionTime: lastRedemptionTime.toString(),
+      totalAccessSecondsPurchased: totalAccessSecondsPurchased.toString(),
+      totalPaid: totalPaid.toString(),
+      canWithdraw: canWithdraw,
       cooldownRemaining: cooldownRemaining.toString(),
+      applicableInflationPercent: applicableInflationPercent.toString(),
+    })
+    const [
+      baseAccessPrice,
+      minimumPaymentAmount,
+      withdrawCooldownInDays,
+      inflationWindowInHours,
+      inflationPercent,
+    ] = await getAccessPricingInfo(chainRpcUrl)
+    console.log('[PU] getAccessPricingInfo: ', {
+      baseAccessPrice: baseAccessPrice.toString(),
+      minimumPaymentAmount: minimumPaymentAmount.toString(),
+      withdrawCooldownInDays: withdrawCooldownInDays.toString(),
+      inflationWindowInHours: inflationWindowInHours.toString(),
+      inflationPercent: inflationPercent.toString(),
     })
     showInputSection()
+    const minPaymentAmountEth = convertWeiToEth(minimumPaymentAmount)
+    updateAmountSliderRange(minPaymentAmountEth, 5 * minPaymentAmountEth) // TOOD: What is a better way to set max?
     await setUserDepositIntentButtonText()
     if (!canWithdraw) {
       const withdrawButton = document.getElementById('popup-user-withdraw-intent-button')
@@ -90,7 +124,7 @@ async function processUserDepositIntent() {
 async function processUserWithdrawIntent() {
   const chainRpcUrl = await getChainRpcUrlFromStorage()
   const userAddress = await getUserAddress()
-  const [, , , , canWithdraw] = await getAccessInfo(chainRpcUrl, userAddress)
+  const [, , , , , , canWithdraw, , ,] = await getAccessInfo(chainRpcUrl, userAddress)
   if (!canWithdraw) {
     alert('Withdrawal not allowed at this time. Please check your balance and cooldown period.')
     return

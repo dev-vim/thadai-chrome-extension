@@ -9,19 +9,24 @@ import { ErrorDecoder } from 'ethers-decode-error'
  * @returns {string} Formatted time string (e.g., "24 min", "2 hr 15 min")
  */
 export function formatAccessTime(accessSeconds) {
-  const accessMinutes = accessSeconds / 60
+  const accessMinutes = accessSeconds / 60;
 
   if (accessMinutes < 1) {
-    return `${Math.round(accessSeconds)} sec`
+    return `${Math.round(accessSeconds)} sec`;
   } else if (accessMinutes < 60) {
-    return `${Math.round(accessMinutes)} min`
+    return `${Math.round(accessMinutes)} min`;
   } else {
-    const hours = Math.floor(accessMinutes / 60)
-    const minutes = Math.round(accessMinutes % 60)
+    let hours = Math.floor(accessMinutes / 60);
+    let minutes = Math.round(accessMinutes % 60);
+    // Handle rounding up to next hour if minutes == 60
+    if (minutes === 60) {
+      hours += 1;
+      minutes = 0;
+    }
     if (minutes === 0) {
-      return `${hours} hr`
+      return `${hours} hr`;
     } else {
-      return `${hours} hr ${minutes} min`
+      return `${hours} hr ${minutes} min`;
     }
   }
 }
@@ -36,6 +41,11 @@ export function calculateAccessTime(ethAmount) {
   const weiAmountNum = Number(weiAmount)
   const basePriceNum = Number(BASE_ACCESS_PRICE_WEI)
   return weiAmountNum / basePriceNum
+}
+
+export function convertWeiToEth(weiAmount) {
+  const ethAmount = parseFloat(weiAmount.toString()) / 1e18
+  return ethAmount
 }
 
 /**
@@ -58,9 +68,7 @@ export async function formatContractError(error) {
   const contractAbi = getThadaiContractAbi()
   const errorDecoder = ErrorDecoder.create([contractAbi])
   const { reason, type } = await errorDecoder.decode(error)
-
-  // TODO: Handle insufficient funds error
-
+  
   if (reason === 'PaymentBelowMinimumAmount') {
     return 'The payment amount is below the minimum required.'
   } else if (reason === 'NoBalanceToWithdraw') {

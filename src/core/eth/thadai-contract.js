@@ -46,7 +46,34 @@ export async function withdrawFunds(chainRpcUrl, userPrivateKey) {
 export async function getAccessInfo(chainRpcUrl, userAddress) {
   const provider = getThadaiContractProvider(chainRpcUrl)
   const contract = getThadaiContract(provider)
-  const [accessUntil, balance, totalPaid, lastRedemptionTime, canWithdraw, cooldownRemaining] =
-    await contract.getUserAccessInfo(userAddress)
-  return [accessUntil, balance, totalPaid, lastRedemptionTime, canWithdraw, cooldownRemaining]
+  const [
+    balance,
+    accessUntil,
+    lastPurchaseTime,
+    lastRedemptionTime,
+    totalAccessSecondsPurchased,
+    totalPaid,
+    canWithdraw,
+    cooldownRemaining,
+    applicableInflationPercent,
+  ] = await contract.getUserAccessInfo(userAddress)
+  return [
+    balance,
+    accessUntil,
+    lastPurchaseTime,
+    lastRedemptionTime,
+    totalAccessSecondsPurchased,
+    totalPaid,
+    canWithdraw,
+    cooldownRemaining,
+    applicableInflationPercent,
+  ]
+}
+
+export async function getAccessPricingInfo(chainRpcUrl) {
+  const provider = getThadaiContractProvider(chainRpcUrl)
+  const contract = getThadaiContract(provider)
+  const [basePrice, minimumPayment, withdrawCooldown, inflationWindow, inflationPercent] =
+    await contract.getAccessPricingInfo()
+  return [basePrice, minimumPayment, withdrawCooldown, inflationWindow, inflationPercent]
 }
