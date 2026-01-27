@@ -9,24 +9,24 @@ import { ErrorDecoder } from 'ethers-decode-error'
  * @returns {string} Formatted time string (e.g., "24 min", "2 hr 15 min")
  */
 export function formatAccessTime(accessSeconds) {
-  const accessMinutes = accessSeconds / 60;
+  const accessMinutes = accessSeconds / 60
 
   if (accessMinutes < 1) {
-    return `${Math.round(accessSeconds)} sec`;
+    return `${Math.round(accessSeconds)} sec`
   } else if (accessMinutes < 60) {
-    return `${Math.round(accessMinutes)} min`;
+    return `${Math.round(accessMinutes)} min`
   } else {
-    let hours = Math.floor(accessMinutes / 60);
-    let minutes = Math.round(accessMinutes % 60);
+    let hours = Math.floor(accessMinutes / 60)
+    let minutes = Math.round(accessMinutes % 60)
     // Handle rounding up to next hour if minutes == 60
     if (minutes === 60) {
-      hours += 1;
-      minutes = 0;
+      hours += 1
+      minutes = 0
     }
     if (minutes === 0) {
-      return `${hours} hr`;
+      return `${hours} hr`
     } else {
-      return `${hours} hr ${minutes} min`;
+      return `${hours} hr ${minutes} min`
     }
   }
 }
@@ -65,10 +65,22 @@ export async function formatContractError(error) {
   if (error.message === 'Failed to fetch') {
     return 'Unable to connect to the blockchain network.'
   }
+
+  if (
+    error.code === 'INSUFFICIENT_FUNDS' ||
+    (error.info &&
+      error.info.error &&
+      error.info.error.message &&
+      error.info.error.message.includes('Insufficient funds')) ||
+    (typeof error.message === 'string' && error.message.includes('insufficient funds'))
+  ) {
+    return 'You do not have enough ETH to complete this transaction.'
+  }
+
   const contractAbi = getThadaiContractAbi()
   const errorDecoder = ErrorDecoder.create([contractAbi])
   const { reason, type } = await errorDecoder.decode(error)
-  
+
   if (reason === 'PaymentBelowMinimumAmount') {
     return 'The payment amount is below the minimum required.'
   } else if (reason === 'NoBalanceToWithdraw') {

@@ -19,11 +19,6 @@ export function updateUsageHint(ethAmount) {
 }
 
 export function updateAmountSliderRange(minEthAmount, maxEthAmount) {
-  console.log(
-    '[PU] Updating amount slider range:',
-    formatEthAmount(minEthAmount),
-    formatEthAmount(maxEthAmount),
-  )
   const slider = document.getElementById('popup-amount-slider')
   slider.min = minEthAmount.toString()
   slider.max = maxEthAmount.toString()
