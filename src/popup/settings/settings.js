@@ -23,25 +23,34 @@ document.addEventListener('DOMContentLoaded', async function () {
   const chainNameInput = document.getElementById('chain-name-input')
   const chainIdInput = document.getElementById('chain-id-input')
   const chainRpcUrlInput = document.getElementById('chain-rpc-url-input')
+  const thadaiContractAddressInput = document.getElementById('thadai-contract-address-input')
   const backBtn = document.getElementById('settings-back-btn')
 
-  const { THADAI_USER_PRIVATE_KEY, THADAI_CHAIN_NAME, THADAI_CHAIN_ID, THADAI_CHAIN_RPC_URL } =
-    await chrome.storage.local.get([
-      'THADAI_USER_PRIVATE_KEY',
-      'THADAI_CHAIN_NAME',
-      'THADAI_CHAIN_ID',
-      'THADAI_CHAIN_RPC_URL',
-    ])
+  const {
+    THADAI_USER_PRIVATE_KEY,
+    THADAI_CHAIN_NAME,
+    THADAI_CHAIN_ID,
+    THADAI_CHAIN_RPC_URL,
+    THADAI_CONTRACT_ADDRESS,
+  } = await chrome.storage.local.get([
+    'THADAI_USER_PRIVATE_KEY',
+    'THADAI_CHAIN_NAME',
+    'THADAI_CHAIN_ID',
+    'THADAI_CHAIN_RPC_URL',
+    'THADAI_CONTRACT_ADDRESS',
+  ])
   privateKeyInput.value = THADAI_USER_PRIVATE_KEY || ''
   chainNameInput.value = THADAI_CHAIN_NAME || ''
   chainIdInput.value = THADAI_CHAIN_ID || ''
   chainRpcUrlInput.value = THADAI_CHAIN_RPC_URL || ''
+  thadaiContractAddressInput.value = THADAI_CONTRACT_ADDRESS || ''
 
   saveSettingsBtn.addEventListener('click', async function () {
     const key = privateKeyInput.value.trim()
     const chainName = chainNameInput.value.trim()
     const chainId = chainIdInput.value.trim()
     const chainRpcUrl = chainRpcUrlInput.value.trim()
+    const contractAddress = thadaiContractAddressInput.value.trim()
     if (!key || !isValidPrivateKey(key)) {
       alert('Please enter a valid private key.')
       return
@@ -58,11 +67,16 @@ document.addEventListener('DOMContentLoaded', async function () {
       alert('Please enter a chain RPC URL.')
       return
     }
+    if (!contractAddress) {
+      alert('Please enter the Thadai contract address.')
+      return
+    }
     await chrome.storage.local.set({
       THADAI_USER_PRIVATE_KEY: key,
       THADAI_CHAIN_NAME: chainName,
       THADAI_CHAIN_ID: chainId,
       THADAI_CHAIN_RPC_URL: chainRpcUrl,
+      THADAI_CONTRACT_ADDRESS: contractAddress,
     })
     alert('Settings saved')
   })

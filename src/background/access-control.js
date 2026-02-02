@@ -2,6 +2,7 @@ import { checkAccess } from '../core/eth/thadai-contract.js'
 import {
   getChainRpcUrlFromStorage,
   getUserAddress,
+  getThadaiContractAddressFromStorage,
   isThadaiConfigurationSet,
 } from '../common/session-user-data.js'
 
@@ -17,11 +18,20 @@ export async function isAccessAllowed() {
   try {
     const chainRpcUrl = await getChainRpcUrlFromStorage()
     const userAddress = await getUserAddress()
-    const [hasAccess, remainingSeconds] = await checkAccess(chainRpcUrl, userAddress)
-    console.log('[BGW] checkAccess result:', {
+    const thadaiContractAddress = await getThadaiContractAddressFromStorage()
+    const [hasAccess, remainingSeconds] = await checkAccess(
+      chainRpcUrl,
+      userAddress,
+      thadaiContractAddress,
+    )
+    console.log(
+      '[BGW] checkAccess result for user',
+      userAddress,
+      ': hasAccess =',
       hasAccess,
-      remainingSeconds: remainingSeconds.toString(),
-    })
+      ', remainingSeconds =',
+      remainingSeconds.toString(),
+    )
     return hasAccess
   } catch (error) {
     if (error.message == 'Failed to fetch') {

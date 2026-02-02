@@ -1,4 +1,3 @@
-export const THADAI_ADDRESS = '0xAD523115cd35a8d4E60B3C0953E0E0ac10418309' // my local anvil contract address
 export const THADAI_ABI = [
   {
     type: 'constructor',

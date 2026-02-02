@@ -4,10 +4,12 @@ export function isThadaiConfigurationSet() {
   return Promise.all([
     chrome.storage.local.get('THADAI_USER_PRIVATE_KEY'),
     chrome.storage.local.get('THADAI_CHAIN_RPC_URL'),
-  ]).then(([privateKeyResult, rpcUrlResult]) => {
+    chrome.storage.local.get('THADAI_CONTRACT_ADDRESS'),
+  ]).then(([privateKeyResult, rpcUrlResult, contractAddressResult]) => {
     const privateKey = privateKeyResult.THADAI_USER_PRIVATE_KEY
     const rpcUrl = rpcUrlResult.THADAI_CHAIN_RPC_URL
-    return Boolean(privateKey && rpcUrl)
+    const contractAddress = contractAddressResult.THADAI_CONTRACT_ADDRESS
+    return Boolean(privateKey && rpcUrl && contractAddress)
   })
 }
 
@@ -20,6 +22,12 @@ export function getPrivateKeyFromStorage() {
 export function getChainRpcUrlFromStorage() {
   return chrome.storage.local.get('THADAI_CHAIN_RPC_URL').then((result) => {
     return result.THADAI_CHAIN_RPC_URL
+  })
+}
+
+export function getThadaiContractAddressFromStorage() {
+  return chrome.storage.local.get('THADAI_CONTRACT_ADDRESS').then((result) => {
+    return result.THADAI_CONTRACT_ADDRESS
   })
 }
 

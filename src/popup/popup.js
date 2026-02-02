@@ -22,6 +22,7 @@ import {
   getPrivateKeyFromStorage,
   getChainRpcUrlFromStorage,
   getUserAddress,
+  getThadaiContractAddressFromStorage,
 } from '../common/session-user-data.js'
 import { formatContractError, convertWeiToEth } from './utils.js'
 
@@ -30,10 +31,12 @@ document.addEventListener('DOMContentLoaded', async function () {
   if (!isConfigurationSet) {
     hideInputSection()
     displaySetConfigurationMessage()
+    return
   }
   try {
     const chainRpcUrl = await getChainRpcUrlFromStorage()
     const userAddress = await getUserAddress()
+    const thadaiContractAddress = await getThadaiContractAddressFromStorage()
     const [
       balance,
       accessUntil,
@@ -44,7 +47,7 @@ document.addEventListener('DOMContentLoaded', async function () {
       canWithdraw,
       cooldownRemaining,
       applicableInflationPercent,
-    ] = await getAccessInfo(chainRpcUrl, userAddress)
+    ] = await getAccessInfo(chainRpcUrl, userAddress, thadaiContractAddress)
     console.log('[PU] getAccessInfo: ', {
       balance: balance.toString(),
       accessUntil: accessUntil.toString(),
@@ -62,7 +65,7 @@ document.addEventListener('DOMContentLoaded', async function () {
       withdrawCooldownInDays,
       inflationWindowInHours,
       inflationPercent,
-    ] = await getAccessPricingInfo(chainRpcUrl)
+    ] = await getAccessPricingInfo(chainRpcUrl, thadaiContractAddress)
     console.log('[PU] getAccessPricingInfo: ', {
       baseAccessPrice: baseAccessPrice.toString(),
       minimumPaymentAmount: minimumPaymentAmount.toString(),
@@ -89,7 +92,7 @@ document.getElementById('settings-btn').addEventListener('click', function () {
   window.open(
     settingsUrl,
     '_blank',
-    'width=330,height=500,left=100,top=100,menubar=no,toolbar=no,location=no,status=no',
+    'width=330,height=550,left=100,top=100,menubar=no,toolbar=no,location=no,status=no',
   )
 })
 
@@ -124,7 +127,12 @@ async function processUserDepositIntent() {
 async function processUserWithdrawIntent() {
   const chainRpcUrl = await getChainRpcUrlFromStorage()
   const userAddress = await getUserAddress()
-  const [, , , , , , canWithdraw, , ,] = await getAccessInfo(chainRpcUrl, userAddress)
+  const thadaiContractAddress = await getThadaiContractAddressFromStorage()
+  const [, , , , , , canWithdraw, , ,] = await getAccessInfo(
+    chainRpcUrl,
+    userAddress,
+    thadaiContractAddress,
+  )
   if (!canWithdraw) {
     alert('Withdrawal not allowed at this time. Please check your balance and cooldown period.')
     return
@@ -133,7 +141,8 @@ async function processUserWithdrawIntent() {
   showSpinner()
   try {
     const userPrivateKey = await getPrivateKeyFromStorage()
-    const receipt = await withdrawFunds(chainRpcUrl, userPrivateKey)
+    const thadaiContractAddress = await getThadaiContractAddressFromStorage()
+    const receipt = await withdrawFunds(chainRpcUrl, userPrivateKey, thadaiContractAddress)
     console.log('[PU] withdrawFunds receipt', receipt)
     alert('Withdrawal successful!')
     hideSpinner()
@@ -164,7 +173,8 @@ async function userPurchaseAccess() {
     const amount = getSliderAmount()
     const userPrivateKey = await getPrivateKeyFromStorage()
     const chainRpcUrl = await getChainRpcUrlFromStorage()
-    const receipt = await purchaseAccess(amount, chainRpcUrl, userPrivateKey)
+    const thadaiContractAddress = await getThadaiContractAddressFromStorage()
+    const receipt = await purchaseAccess(amount, chainRpcUrl, userPrivateKey, thadaiContractAddress)
     console.log('[PU] purchaseAccess receipt', receipt)
     notifyOnPurchaseAccessSuccess()
     hideSpinner()
@@ -201,7 +211,8 @@ async function userTopup() {
     const amount = getSliderAmount()
     const userPrivateKey = await getPrivateKeyFromStorage()
     const chainRpcUrl = await getChainRpcUrlFromStorage()
-    const receipt = await purchaseAccess(amount, chainRpcUrl, userPrivateKey)
+    const thadaiContractAddress = await getThadaiContractAddressFromStorage()
+    const receipt = await purchaseAccess(amount, chainRpcUrl, userPrivateKey, thadaiContractAddress)
     console.log('[PU] topup receipt', receipt)
     notifyOnTopupSuccess()
     hideSpinner()

@@ -17,6 +17,10 @@
   box-sizing: border-box;
 }
 
+#thadai-contract-address-input {
+  font-family: monospace;
+}
+
 .settings-save-btn {
   width: 100%;
   background: #4caf50;
