@@ -1,3 +1,7 @@
+<p align="center">
+   <img src="public/img/logo_transparent_bg_1000px.png" alt="Thadai Logo" height="300" />
+</p>
+
 # Thadai Chrome Extension
 
 A productivity-focused Chrome extension that blocks distracting websites and uses a smart contract as an access control engine. Users must purchase access time through the blockchain to unblock restricted sites, creating a financial incentive to stay focused.
@@ -30,30 +34,69 @@ TODO
 
 ## Smart Contract Integration
 
-TODO
+The extension integrates with the **ThadaiCoreV1** Ethereum smart contract for access control. It uses the [ethers.js](https://docs.ethers.org/) library to:
+
+- Check if a user's wallet address has active access to blocked sites by calling `checkAccess` on the contract.
+- Allow users to purchase access time by sending ETH to the contract via `purchaseAccess`.
+- Query access pricing and withdrawal cooldowns using contract view functions.
+- Withdraw funds (if eligible) from the contract.
+
+All contract configuration (RPC URL, contract address, user private key) is managed in the extension's settings UI and stored securely in Chrome local storage.
 
 ## Setup
 
 ### Prerequisites
 
-TODO
+- Node.js >= 14.18.0
+- Chrome browser (for extension usage and testing)
+- [Foundry](https://book.getfoundry.sh/) (for local smart contract deployment/testing)
 
 ### Installation
 
-TODO
+1. Clone this repository:
+   ```sh
+   git clone https://github.com/dev-vim/thadai-chrome-extension.git
+   cd thadai-chrome-extension
+   ```
+2. Install dependencies:
+   ```sh
+   npm install
+   ```
+3. Build the extension:
+   ```sh
+   npm run build
+   ```
+4. Load the extension in Chrome:
+   - Go to `chrome://extensions` and enable "Developer mode"
+   - Click "Load unpacked" and select the `build/` directory
 
 ### Configuration
 
-TODO
+1. Click the extension icon and open the settings (gear icon).
+2. Enter the following details:
+   - **Private Key**: Your Ethereum wallet private key (used for signing transactions)
+   - **Blockchain Name**: e.g. "Ethereum Mainnet" or "Anvil Local"
+   - **Blockchain ID**: e.g. `1` for mainnet, `31337` for Anvil
+   - **Blockchain RPC URL**: e.g. `https://mainnet.infura.io/v3/xxx` or `http://localhost:8545`
+   - **Thadai Contract Address**: The deployed ThadaiCoreV1 contract address
+3. Save settings. The extension is now ready to use.
 
 ## Usage
 
-TODO
+1. By default, the extension blocks access to distracting websites (e.g., Facebook, Instagram, Reddit, YouTube).
+2. When you visit a blocked site, a message is shown with an option to purchase access.
+3. Use the popup to select the amount of ETH to spend and duration of access, then confirm the transaction.
+4. Once the transaction is confirmed on-chain, the site is unblocked for the purchased time.
+5. You can withdraw unused balance (if eligible) from the popup.
+6. Manage blocked sites and blockchain settings from the extension's settings page.
 
 ## Security Notes
 
-TODO
+- **Private Key Storage**: The extension stores your private key in Chrome local storage. For best security, use a dedicated wallet with limited funds.
+- **Blockchain Transactions**: All access purchases and withdrawals are on-chain and require ETH for gas.
+- **No Server-Side Storage**: All logic and data are handled client-side or on-chain; no user data is sent to external servers.
+- **Risks**: If your private key is compromised, funds in the associated wallet may be at risk. Never reuse a primary wallet.
 
 ## Related Projects
 
-- **ThadaiCoreV1 Smart Contract**: The access control engine contract
+- **ThadaiCoreV1 Smart Contract**: The access control engine contract.

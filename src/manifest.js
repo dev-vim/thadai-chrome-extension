@@ -29,4 +29,10 @@ export default defineManifest({
     },
   ],
   permissions: ['tabs', 'storage'],
+  web_accessible_resources: [
+    {
+      resources: ['img/logo_transparent_bg_1000px.png'],
+      matches: ['<all_urls>'],
+    },
+  ],
 })

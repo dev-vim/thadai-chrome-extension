@@ -16,6 +16,12 @@ const ViewPortBlocker = (unblockButtonFn) => {
   container.style.cssText =
     'width: 100%; height: 100%; background: black; display: flex; flex-direction: column; justify-content: center; align-items: center;'
 
+  // Create the logo image
+  const logo = document.createElement('img')
+  logo.src = chrome.runtime.getURL('img/logo_transparent_bg_1000px.png')
+  logo.alt = 'Thadai Logo'
+  logo.style.cssText = 'height: 400px; width: auto; margin-bottom: 18px; display: block;'
+
   // Create the text content
   const textContent = document.createElement('div')
   textContent.style.cssText =
@@ -40,6 +46,7 @@ const ViewPortBlocker = (unblockButtonFn) => {
   }
 
   textContent.appendChild(unblockButton)
+  container.appendChild(logo)
   container.appendChild(textContent)
   shadow.appendChild(container)
 
