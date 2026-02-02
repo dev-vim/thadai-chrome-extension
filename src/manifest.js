@@ -9,14 +9,14 @@ export default defineManifest({
   version: packageData.version,
   manifest_version: 3,
   icons: {
-    16: 'img/icon-16.png',
-    32: 'img/icon-32.png',
-    48: 'img/icon-48.png',
-    128: 'img/icon-128.png',
+    16: 'icons/icon-16.png',
+    32: 'icons/icon-32.png',
+    48: 'icons/icon-48.png',
+    128: 'icons/icon-128.png',
   },
   action: {
     default_popup: 'src/popup/popup.html',
-    default_icon: 'img/icon-48.png',
+    default_icon: 'icons/icon-48.png',
   },
   background: {
     service_worker: 'src/background/worker.js',

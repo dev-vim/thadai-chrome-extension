@@ -36,6 +36,13 @@
   margin-bottom: 10px;
 }
 
+.popup-heading {
+  font-size: 12px;
+  font-weight: bold;
+  color: #4caf50;
+  margin-left: 5px;
+}
+
 .icon-btn {
   background: none;
   border: none;
