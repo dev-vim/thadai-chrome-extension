@@ -1,0 +1,238 @@
+/* Spinner overlay for popup */
+.popup-spinner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.popup-spinner {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 6px solid #e0e0e0;
+  border-top: 6px solid #4caf50;
+  animation: popup-spin 1s linear infinite;
+  background: transparent;
+}
+
+@keyframes popup-spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Popup header and icon button */
+.popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.popup-heading {
+  font-size: 12px;
+  font-weight: bold;
+  color: #4caf50;
+  margin-left: 5px;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+}
+
+#settings-back-btn {
+  color: #4caf50;
+  font-size: 20px;
+  font-weight: bold;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-right: 8px;
+}
+
+#popup-settings-page .settings-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 10px 0 0 0;
+}
+
+body {
+  text-align: center;
+  width: 200px;
+  height: 240px;
+}
+
+#popup-settings-page {
+  height: 380px;
+  overflow-y: auto;
+}
+
+.popup-user-inputs-section {
+  display: none;
+}
+
+.popup-user-inputs-section.visible {
+  display: block;
+}
+
+.amount-slider-container {
+  margin: 15px 0;
+}
+
+.amount-slider-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.amount-usage-hint {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 12px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.amount-slider {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: #ddd;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.amount-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #4caf50;
+  cursor: pointer;
+}
+
+.amount-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #4caf50;
+  cursor: pointer;
+  border: none;
+}
+
+.amount-limits {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+}
+
+/* Button styles */
+#popup-user-deposit-intent-button {
+  width: 100%;
+  padding: 10px 15px;
+  min-height: 40px;
+  box-sizing: border-box;
+  margin-top: 10px;
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#popup-user-deposit-intent-button:hover {
+  background-color: #45a049;
+}
+
+#popup-user-deposit-intent-button.loading {
+  background-color: transparent;
+  border: none;
+  padding: 10px 15px;
+}
+
+#popup-user-withdraw-intent-button {
+  width: 100%;
+  padding: 10px 15px;
+  min-height: 40px;
+  box-sizing: border-box;
+  margin-top: 10px;
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#popup-user-withdraw-intent-button:hover {
+  background-color: #45a049;
+}
+
+#popup-user-withdraw-intent-button.loading {
+  background-color: transparent;
+  border: none;
+  padding: 10px 15px;
+}
+
+/* Loading spinner styles */
+.loader {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 8px solid transparent;
+  border-right-color: #4caf50;
+  position: relative;
+  animation: l24 1s infinite linear;
+  margin: 0 auto;
+  background: transparent;
+}
+
+.loader:before,
+.loader:after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: inherit;
+  animation: inherit;
+  animation-duration: 2s;
+  background: transparent;
+}
+
+@keyframes l24 {
+  100% {
+    transform: rotate(1turn);
+  }
+}
+
+/* Success message styles */
+.success-message {
+  display: none;
+  padding: 20px 15px;
+  font-size: 16px;
+  color: #333;
+  font-weight: 500;
+  text-align: center;
+}
+
+.success-message.visible {
+  display: block;
+}

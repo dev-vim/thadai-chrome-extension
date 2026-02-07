@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thadai</title>
+    <link rel="stylesheet" href="./popup.css" />
+  </head>
+
+  <body>
+    <div class="popup-window">
+      <div class="popup-header">
+        <p id="popup-heading" class="popup-heading">Thadai Chrome Extension</p>
+        <button id="settings-btn" class="icon-btn" title="Settings" type="button">
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#4CAF50"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 8 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 8a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 8 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09A1.65 1.65 0 0 0 16 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 8c.14.31.22.65.22 1v.09A1.65 1.65 0 0 0 21 12c0 .35-.08.69-.22 1z"
+            />
+          </svg>
+        </button>
+      </div>
+      <div id="popup-content">
+        <div class="popup-user-inputs-section" id="popup-user-inputs-section">
+          <div class="amount-slider-container">
+            <div class="amount-usage-hint" id="popup-usage-hint">24 min (0.0006 ETH)</div>
+            <input
+              id="popup-amount-slider"
+              type="range"
+              min="0.000607"
+              max="0.015152"
+              step="0.000001"
+              value="0.000607"
+              class="amount-slider"
+            />
+            <div class="amount-limits">
+              <span>$2</span>
+              <span>$50</span>
+            </div>
+          </div>
+          <button id="popup-user-deposit-intent-button">User Deposit Intent</button>
+          <button id="popup-user-withdraw-intent-button">Withdraw Balance</button>
+        </div>
+        <div class="popup-spinner-overlay" id="popup-spinner-overlay" style="display: none">
+          <div class="popup-spinner"></div>
+        </div>
+        <div class="success-message" id="popup-banner-message">Enjoy winding down!</div>
+      </div>
+    </div>
+    <script type="module" src="./popup.js"></script>
+  </body>
+</html>
