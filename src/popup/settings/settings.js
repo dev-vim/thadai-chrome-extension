@@ -78,7 +78,8 @@ document.addEventListener('DOMContentLoaded', async function () {
       THADAI_CHAIN_RPC_URL: chainRpcUrl,
       THADAI_CONTRACT_ADDRESS: contractAddress,
     })
-    alert('Settings saved')
+    // TODO: Replace save button with text?
+    // alert('Settings saved')
   })
 
   backBtn.addEventListener('click', function () {
