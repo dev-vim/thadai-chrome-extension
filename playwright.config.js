@@ -47,6 +47,7 @@ export default defineConfig({
   //   url: 'http://localhost:3000',
   //   reuseExistingServer: !process.env.CI,
   // },
+  
   // Anvil local blockchain for testing
   webServer: {
     command: 'anvil --port 7777 --load-state ./test/anvil/state.json',
