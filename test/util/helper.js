@@ -6,9 +6,9 @@ export async function setThadaiConfig(page, overrides = {}) {
     THADAI_CHAIN_ID: '31337',
     THADAI_CHAIN_RPC_URL: 'http://localhost:7777',
     THADAI_CONTRACT_ADDRESS: '0xAD523115cd35a8d4E60B3C0953E0E0ac10418309',
-  };
-  const config = { ...defaultConfig, ...overrides };
+  }
+  const config = { ...defaultConfig, ...overrides }
   await page.evaluate((cfg) => {
-    chrome.storage.local.set(cfg);
-  }, config);
+    chrome.storage.local.set(cfg)
+  }, config)
 }
