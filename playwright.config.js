@@ -51,5 +51,6 @@ export default defineConfig({
   // Anvil local blockchain for testing
   webServer: {
     command: 'anvil --port 7777 --load-state ./test/anvil/state.json',
+    reuseExistingServer: true,
   },
 })

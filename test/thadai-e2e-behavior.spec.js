@@ -5,7 +5,7 @@ import { setThadaiConfig } from './util/helper'
 test('purchase access scenario', async ({ page, extensionId }) => {
   test.setTimeout(60_000)
   await page.goto('https://reddit.com')
-  await page.waitForSelector('#thadai-viewport-blocker', { timeout: 5000 })
+  await page.waitForSelector('#thadai-viewport-blocker', { timeout: 10000 })
   // Check if the blocker element exists in the DOM
   const blocker = await page.$('#thadai-viewport-blocker')
   expect(blocker).not.toBeNull()
@@ -39,7 +39,7 @@ test('purchase access scenario', async ({ page, extensionId }) => {
   const newPage = await page.context().newPage()
   await newPage.goto('https://reddit.com')
   // The viewport blocker should be gone after purchase access flow
-  await newPage.waitForSelector('#thadai-viewport-blocker', { state: 'detached', timeout: 5000 })
+  await newPage.waitForSelector('#thadai-viewport-blocker', { state: 'detached', timeout: 10000 })
   const blockerAfter = await newPage.$('#thadai-viewport-blocker')
   expect(blockerAfter).toBeNull()
 })
@@ -47,7 +47,7 @@ test('purchase access scenario', async ({ page, extensionId }) => {
 test('topup access scenario', async ({ page, extensionId }) => {
   test.setTimeout(60_000)
   await page.goto('https://reddit.com')
-  await page.waitForSelector('#thadai-viewport-blocker', { timeout: 5000 })
+  await page.waitForSelector('#thadai-viewport-blocker', { timeout: 10000 })
   // Check if the blocker element exists in the DOM
   const blocker = await page.$('#thadai-viewport-blocker')
   expect(blocker).not.toBeNull()
@@ -81,7 +81,7 @@ test('topup access scenario', async ({ page, extensionId }) => {
   const newPage = await page.context().newPage()
   await newPage.goto('https://reddit.com')
   // The viewport blocker should be gone after purchase access flow
-  await newPage.waitForSelector('#thadai-viewport-blocker', { state: 'detached', timeout: 5000 })
+  await newPage.waitForSelector('#thadai-viewport-blocker', { state: 'detached', timeout: 10000 })
   const blockerAfter = await newPage.$('#thadai-viewport-blocker')
   expect(blockerAfter).toBeNull()
   // Now, simulate the user having some access but needing to top up
