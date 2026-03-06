@@ -4,7 +4,6 @@
 # ignore node dependency directories & lock
 node_modules
 yarn.lock
-pnpm-lock.yaml
 package-lock.json
 
 # ignore log files and local

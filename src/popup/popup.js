@@ -25,6 +25,7 @@ import {
   getThadaiContractAddressFromStorage,
 } from '../common/session-user-data.js'
 import { formatContractError, convertWeiToEth } from './utils.js'
+import { PU_ON_PURCHASE_ACCESS_SUCCESS, PU_ON_TOPUP_SUCCESS } from '../common/message-types.js'
 
 document.addEventListener('DOMContentLoaded', async function () {
   const isConfigurationSet = await isThadaiConfigurationSet()
@@ -193,7 +194,7 @@ async function userPurchaseAccess() {
 }
 
 function notifyOnPurchaseAccessSuccess() {
-  const request = { type: 'PU_ON_PURCHASE_ACCESS_SUCCESS' }
+  const request = { type: PU_ON_PURCHASE_ACCESS_SUCCESS }
   chrome.runtime.sendMessage(request, (response) => {
     if (response && !response.success) {
       console.log(
@@ -231,7 +232,7 @@ async function userTopup() {
 }
 
 function notifyOnTopupSuccess() {
-  const request = { type: 'PU_ON_TOPUP_SUCCESS' }
+  const request = { type: PU_ON_TOPUP_SUCCESS }
   chrome.runtime.sendMessage(request, (response) => {
     if (response && !response.success) {
       console.log('[PU] Internal error: Topup succeeded notification not processed as expected')

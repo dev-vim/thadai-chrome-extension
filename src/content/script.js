@@ -1,7 +1,8 @@
 import { unblockViewPort, processViewPortBlock } from './viewport/viewport-ops.js'
+import { BGW_ON_ACCESS_ALLOWED } from '../common/message-types.js'
 
 chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
-  if (request.type == 'BGW_ON_ACCESS_ALLOWED') {
+  if (request.type == BGW_ON_ACCESS_ALLOWED) {
     sendResponse({ success: true })
     unblockViewPort()
   }

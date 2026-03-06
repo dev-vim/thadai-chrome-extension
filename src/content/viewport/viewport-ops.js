@@ -1,3 +1,5 @@
+import { CS_REQUEST_TOPUP, CS_IS_ACCESS_ALLOWED } from '../../common/message-types.js'
+
 const ViewPortBlocker = (unblockButtonFn) => {
   // Create the viewPortBlocker element
   let viewPortBlocker = document.createElement('div')
@@ -54,7 +56,7 @@ const ViewPortBlocker = (unblockButtonFn) => {
 }
 
 function requestTopupForAccess() {
-  const request = { type: 'CS_REQUEST_TOPUP' }
+  const request = { type: CS_REQUEST_TOPUP }
   chrome.runtime.sendMessage(request, (response) => {})
 }
 
@@ -72,7 +74,7 @@ export function unblockViewPort() {
 }
 
 export function processViewPortBlock() {
-  const request = { type: 'CS_IS_ACCESS_ALLOWED' }
+  const request = { type: CS_IS_ACCESS_ALLOWED }
   chrome.runtime.sendMessage(request, (response) => {
     if (response && response.accessAllowed) {
       unblockViewPort()

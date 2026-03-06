@@ -100,3 +100,4 @@ All contract configuration (RPC URL, contract address, user private key) is mana
 ## Related Projects
 
 - **ThadaiCoreV1 Smart Contract**: The access control engine contract.
+- **Thadai Events Watcher**: Couple of scripts to monitor contract events and log access purchases/withdrawals.
