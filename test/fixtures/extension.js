@@ -1,26 +1,3 @@
-// import { chromium } from '@playwright/test'
-// import path from 'path'
-//
-//
-// (async () => {
-//     const extensionPath = path.resolve(__dirname, '../../../build');
-//     const userDataDir = path.resolve('/tmp/test-user-data-dir');
-//     const browserContext = await chromium.launchPersistentContext(userDataDir, {
-//         channel: 'chromium',
-//         headless: false,
-//         args: [
-//             `-disable-extensions-except=${extensionPath}`,
-//             `-load-extension=${extensionPath}`,
-//         ]
-//     });
-//     let [serviceWorker] = browserContext.serviceWorkers();
-//     if (!serviceWorker)
-//         serviceWorker = await browserContext.waitForEvent('serviceworker');
-
-//     // Test the service worker as you would any other worker.
-//     await browserContext.close();
-// });
-
 import { test as base, chromium } from '@playwright/test'
 import path from 'path'
 import { fileURLToPath } from 'url'
