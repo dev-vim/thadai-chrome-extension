@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test'
 
 /**
  * Read environment variables from file.
@@ -38,7 +38,7 @@ export default defineConfig({
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
-    }
+    },
   ],
 
   /* Run your local dev server before starting the tests */
@@ -47,10 +47,9 @@ export default defineConfig({
   //   url: 'http://localhost:3000',
   //   reuseExistingServer: !process.env.CI,
   // },
-  
+
   // Anvil local blockchain for testing
   webServer: {
     command: 'anvil --port 7777 --load-state ./test/anvil/state.json',
   },
-});
-
+})
