@@ -152,3 +152,17 @@ All contract configuration (RPC URL, contract address, user private key) is mana
 
 - **ThadaiCoreV1 Smart Contract**: The access control engine contract.
 - **Thadai Events Watcher**: Couple of scripts to monitor contract events and log access purchases/withdrawals.
+
+## Packaging
+
+To package the extension for distribution:
+
+1. Run `npm run build` to generate the production build in the `build/` directory.
+2. Zip the contents of the `build/` directory:
+   ```sh
+   cd build
+   zip -r ../thadai-chrome-extension.zip .
+   cd ..
+   ```
+3. Upload `thadai-chrome-extension.zip` as a release asset on GitHub (Releases page).
+4. Users can download and load the ZIP as an unpacked extension in Chrome.
