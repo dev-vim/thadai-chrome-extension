@@ -14,6 +14,7 @@ import { defineConfig, devices } from '@playwright/test'
  */
 export default defineConfig({
   testDir: './test',
+  globalSetup: './test/global-setup.js',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -51,5 +52,6 @@ export default defineConfig({
   // Anvil local blockchain for testing
   webServer: {
     command: 'anvil --port 7777 --load-state ./test/anvil/state.json',
+    reuseExistingServer: true,
   },
 })

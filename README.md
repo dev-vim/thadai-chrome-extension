@@ -30,7 +30,58 @@ Thadai Chrome Extension interfaces with websites and interacts with the **Thadai
 
 ## Architecture
 
-TODO
+The Thadai Chrome Extension is organized into four main components, each separated by Chrome's security boundaries:
+
+- **Content Script** (runs in the web page context, isolated from extension code)
+- **Background Worker** (service worker, orchestrates access control and messaging)
+- **Popup** (UI for purchasing access and withdrawing funds)
+- **ThadaiCoreV1 Smart Contract** (modular access control engine on Ethereum)
+
+Below is a detailed flowchart showing boundaries, message flows, and modularity:
+
+```mermaid
+flowchart TD
+    subgraph Chrome Webpage Context
+        CS[Content Script]
+    end
+
+    subgraph Chrome Extension Context
+        BGW[Background Worker]
+        PU[Popup]
+    end
+
+    subgraph Smart Contract Integration
+        ETH["ethers.js Integration"]
+    end
+
+    subgraph Ethereum Network
+        CONTRACT[ThadaiCoreV1 Contract]
+    end
+
+    CS -- "CS_IS_ACCESS_ALLOWED / CS_REQUEST_TOPUP" --> BGW
+    BGW -- "BGW_ON_ACCESS_ALLOWED" --> CS
+    BGW -- "Opens" --> PU
+    PU -- "PU_ON_PURCHASE_ACCESS_SUCCESS / PU_ON_TOPUP_SUCCESS" --> BGW
+    BGW -- "checkAccess (read-only)" --> ETH
+    PU -- "purchaseAccess / withdrawFunds" --> ETH
+    ETH -- "JSON-RPC / Signed Txn" --> CONTRACT
+```
+
+**Message Flow:**
+- Content Script → Background Worker: Access check and top-up requests (CS_IS_ACCESS_ALLOWED, CS_REQUEST_TOPUP)
+- Background Worker → Content Script: Access allowed notification (BGW_ON_ACCESS_ALLOWED)
+- Background Worker → Popup: Opens popup for user action
+- Popup → Background Worker: Purchase/top-up success notification (PU_ON_PURCHASE_ACCESS_SUCCESS, PU_ON_TOPUP_SUCCESS)
+- Background Worker → Ethers.js Integration: Queries access status (read-only)
+- Popup → Ethers.js Integration: Signs and broadcasts transactions (purchase access, withdraw funds)
+- Ethers.js Integration → Smart Contract: JSON-RPC calls and signed transactions
+
+**Chrome Security Boundaries:**
+- Web Page Context is fully sandboxed from the extension.
+- Extension Contexts (background worker, popup) are isolated from the web page and communicate only via message passing.
+
+**Modularity:**
+The integration layer (`src/core/eth/`) is swappable; replacing the smart contract engine only requires updating this layer.
 
 ## Smart Contract Integration
 
@@ -100,3 +151,18 @@ All contract configuration (RPC URL, contract address, user private key) is mana
 ## Related Projects
 
 - **ThadaiCoreV1 Smart Contract**: The access control engine contract.
+- **Thadai Events Watcher**: Couple of scripts to monitor contract events and log access purchases/withdrawals.
+
+## Packaging
+
+To package the extension for distribution:
+
+1. Run `npm run build` to generate the production build in the `build/` directory.
+2. Zip the contents of the `build/` directory:
+   ```sh
+   cd build
+   zip -r ../thadai-chrome-extension.zip .
+   cd ..
+   ```
+3. Upload `thadai-chrome-extension.zip` as a release asset on GitHub (Releases page).
+4. Users can download and load the ZIP as an unpacked extension in Chrome.

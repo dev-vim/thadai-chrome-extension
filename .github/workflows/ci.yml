@@ -1,0 +1,26 @@
+# TODO: Re-enable CI workflow after fixing the Playwright test issues. 
+#       Need to deploy the smart contract to a testnet and update the test configuration accordingly.
+#       For now, we will run tests locally and ensure they pass before merging any PRs.
+# name: CI
+
+# on:
+#   push:
+#     branches: [main]
+#   pull_request:
+#     branches: [main]
+
+# jobs:
+#   build-and-test:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v3
+#       - uses: actions/setup-node@v3
+#         with:
+#           node-version: '22'
+#       - run: npm install
+#       - name: Install Playwright browsers
+#         run: npx playwright install --with-deps chromium
+#       - name: Install Foundry (Anvil)
+#         uses: foundry-rs/foundry-toolchain@v1
+#       - run: npm run build
+#       - run: npm test

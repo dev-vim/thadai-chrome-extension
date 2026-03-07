@@ -43,6 +43,11 @@ export function calculateAccessTime(ethAmount) {
   return weiAmountNum / basePriceNum
 }
 
+/**
+ * Convert a wei amount to ETH as a floating-point number.
+ * @param {bigint|number|string} weiAmount
+ * @returns {number}
+ */
 export function convertWeiToEth(weiAmount) {
   const ethAmount = parseFloat(weiAmount.toString()) / 1e18
   return ethAmount
@@ -61,6 +66,12 @@ export function formatEthAmount(ethAmount) {
   return `${ethRounded.toFixed(4)} ETH`
 }
 
+/**
+ * Decode a contract or network error into a human-readable string.
+ * Handles known ethers error codes and custom ThadaiCoreV1 revert reasons.
+ * @param {Error} error
+ * @returns {Promise<string>}
+ */
 export async function formatContractError(error) {
   if (error.message === 'Failed to fetch') {
     return 'Unable to connect to the blockchain network.'

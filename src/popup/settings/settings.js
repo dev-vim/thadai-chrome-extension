@@ -1,3 +1,5 @@
+import { OPEN_PU_FROM_SETTINGS } from '../../common/message-types.js'
+
 document.addEventListener('DOMContentLoaded', async function () {
   // Tab logic
   const tabBlockchain = document.getElementById('tab-blockchain-settings')
@@ -84,7 +86,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   backBtn.addEventListener('click', function () {
     window.close()
-    chrome.runtime.sendMessage({ type: 'OPEN_PU_FROM_SETTINGS' }, function (response) {})
+    chrome.runtime.sendMessage({ type: OPEN_PU_FROM_SETTINGS }, function (response) {})
   })
 
   // Managed websites logic
