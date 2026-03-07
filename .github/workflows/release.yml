@@ -1,26 +1,27 @@
-name: Release
+# TODO: This workflow is currently disabled. We will enable it once we have a stable release process in place.
+# name: Release
 
-on:
-  workflow_dispatch:
-  push:
-    tags:
-      - 'v*'
+# on:
+#   workflow_dispatch:
+#   push:
+#     tags:
+#       - 'v*'
 
-jobs:
-  release:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '22'
-      - run: npm install
-      - run: npm run build
-      - name: Zip build folder
-        run: cd build && zip -r ../thadai-chrome-extension.zip . && cd ..
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: thadai-chrome-extension.zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+# jobs:
+#   release:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v3
+#       - uses: actions/setup-node@v3
+#         with:
+#           node-version: '22'
+#       - run: npm install
+#       - run: npm run build
+#       - name: Zip build folder
+#         run: cd build && zip -r ../thadai-chrome-extension.zip . && cd ..
+#       - name: Create GitHub Release
+#         uses: softprops/action-gh-release@v1
+#         with:
+#           files: thadai-chrome-extension.zip
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
